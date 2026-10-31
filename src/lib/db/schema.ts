@@ -27,6 +27,7 @@ export const works = pgTable("works", {
   description: text("description"),
   longDescription: text("long_description"),
   edition: text("edition"),
+  year: text("year"),
   price: text("price"),
   buyUrl: text("buy_url"),
   prodigiSku: text("prodigi_sku"),

@@ -31,7 +31,8 @@
           "caption": "",
           "sortOrder": 0
         }
-      ]
+      ],
+      "year": "2026"
     },
     {
       "sectionSlug": "prints",
@@ -60,7 +61,8 @@
           "caption": "Hahnemühle German Etching",
           "sortOrder": 2
         }
-      ]
+      ],
+      "year": "2026"
     },
     {
       "sectionSlug": "metal-plaques",
@@ -90,7 +92,8 @@
           "caption": "Dibond — close-up",
           "sortOrder": 2
         }
-      ]
+      ],
+      "year": "2026"
     },
     {
       "sectionSlug": "metal-plaques",
@@ -115,7 +118,8 @@
           "caption": "Dibond — angled",
           "sortOrder": 1
         }
-      ]
+      ],
+      "year": "2026"
     }
   ],
   "site": {

@@ -16,6 +16,7 @@ type Props = {
     description: string;
     longDescription: string;
     edition: string;
+    year: string;
     price: string;
     buyUrl: string;
     prodigiSku: string;
@@ -30,6 +31,7 @@ const empty = {
   description: "",
   longDescription: "",
   edition: "",
+  year: "",
   price: "",
   buyUrl: "",
   prodigiSku: "",
@@ -113,6 +115,7 @@ export function WorkForm({ sections, initial }: Props) {
       description: form.description || null,
       longDescription: form.longDescription || null,
       edition: form.edition || null,
+      year: form.year || null,
       price: form.price || null,
       buyUrl: form.buyUrl || null,
       prodigiSku: form.prodigiSku || null,
@@ -182,6 +185,14 @@ export function WorkForm({ sections, initial }: Props) {
           value={form.edition}
           onChange={(e) => update("edition", e.target.value)}
           placeholder="Ed. 10/10"
+        />
+      </label>
+      <label>
+        Year
+        <input
+          value={form.year}
+          onChange={(e) => update("year", e.target.value)}
+          placeholder="2026"
         />
       </label>
       <label>

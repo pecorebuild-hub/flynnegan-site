@@ -30,21 +30,34 @@ export default async function HomePage() {
             )[0];
             const href = `/${work.sectionSlug}/${work.slug}`;
             return (
-              <Link key={work.id} href={href} className="latest-item">
-                {cover ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={cover.url}
-                    alt={work.title}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="latest-placeholder" />
-                )}
+              <article key={work.id} className="latest-item">
+                <Link href={href} className="latest-media">
+                  {cover ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={cover.url}
+                      alt={work.title}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="latest-placeholder" />
+                  )}
+                </Link>
                 <div className="latest-meta">
-                  <h2 className="work-title">{work.title}</h2>
+                  <h2 className="work-title">
+                    <Link href={href}>{work.title}</Link>
+                  </h2>
+                  {work.year ? (
+                    <p className="latest-year">{work.year}</p>
+                  ) : null}
+                  {work.description ? (
+                    <p className="latest-desc">{work.description}</p>
+                  ) : null}
+                  <Link href={href} className="latest-view">
+                    [View]
+                  </Link>
                 </div>
-              </Link>
+              </article>
             );
           })}
         </div>

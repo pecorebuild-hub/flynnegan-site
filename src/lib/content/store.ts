@@ -22,6 +22,7 @@ type SeedFile = {
     description: string | null;
     longDescription?: string | null;
     edition?: string | null;
+    year?: string | null;
     price: string | null;
     buyUrl: string | null;
     prodigiSku?: string | null;
@@ -77,6 +78,7 @@ function seedToContent(seed: SeedFile): SiteContent {
       description: w.description,
       longDescription: w.longDescription ?? null,
       edition: w.edition ?? null,
+      year: w.year ?? null,
       price: w.price,
       buyUrl: w.buyUrl,
       prodigiSku: w.prodigiSku ?? null,
@@ -96,6 +98,7 @@ function normalizeContent(content: SiteContent): SiteContent {
       ...work,
       longDescription: work.longDescription ?? null,
       edition: work.edition ?? null,
+      year: work.year ?? null,
     })),
   };
 }
@@ -280,6 +283,7 @@ export type WorkInput = {
   description?: string | null;
   longDescription?: string | null;
   edition?: string | null;
+  year?: string | null;
   price?: string | null;
   buyUrl?: string | null;
   prodigiSku?: string | null;
@@ -321,6 +325,7 @@ export async function createWork(input: WorkInput) {
     description: input.description ?? null,
     longDescription: input.longDescription ?? null,
     edition: input.edition ?? null,
+    year: input.year ?? null,
     price: input.price ?? null,
     buyUrl: input.buyUrl ?? null,
     prodigiSku: input.prodigiSku ?? null,
@@ -377,6 +382,7 @@ export async function createWorksBatch(input: {
   description?: string | null;
   longDescription?: string | null;
   edition?: string | null;
+  year?: string | null;
   prodigiSku?: string | null;
   sharedImages?: Array<{ url: string; caption?: string | null }>;
   rows: Array<{
@@ -385,6 +391,7 @@ export async function createWorksBatch(input: {
     buyUrl?: string | null;
     description?: string | null;
     edition?: string | null;
+    year?: string | null;
   }>;
 }) {
   const created = [];
@@ -397,6 +404,7 @@ export async function createWorksBatch(input: {
       description: row.description ?? input.description,
       longDescription: input.longDescription,
       edition: row.edition ?? input.edition,
+      year: row.year ?? input.year,
       price: row.price,
       buyUrl: row.buyUrl,
       prodigiSku: input.prodigiSku,

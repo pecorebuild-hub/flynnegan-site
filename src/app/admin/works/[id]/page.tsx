@@ -25,6 +25,7 @@ export default async function EditWorkPage({ params }: Props) {
           description: work.description || "",
           longDescription: work.longDescription || "",
           edition: work.edition || "",
+          year: work.year || "",
           price: work.price || "",
           buyUrl: work.buyUrl || "",
           prodigiSku: work.prodigiSku || "",

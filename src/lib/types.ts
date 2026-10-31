@@ -28,6 +28,8 @@ export type SiteWork = {
   longDescription: string | null;
   /** e.g. Ed. 10/10 */
   edition: string | null;
+  /** e.g. 2026 */
+  year: string | null;
   price: string | null;
   buyUrl: string | null;
   prodigiSku: string | null;
