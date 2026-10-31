@@ -17,7 +17,7 @@ export default async function HomePage() {
   const [sections, site, latest] = await Promise.all([
     getNavSections(),
     getSiteMeta(),
-    getLatestWorks(8),
+    getLatestWorks(24),
   ]);
 
   return (
