@@ -51,7 +51,9 @@ export function WorkCard({ work }: Props) {
               <p className="work-alt-inline-label">{work.altLabel}</p>
             ) : null}
             <TextBlocks text={work.altDescription} />
-            {work.altEdition ? <p>{work.altEdition}</p> : null}
+            {work.altEdition ? (
+              <p className="work-meta-dim">{work.altEdition}</p>
+            ) : null}
             {work.altBuyUrl && altPrice ? (
               <a
                 className="buy-button"
