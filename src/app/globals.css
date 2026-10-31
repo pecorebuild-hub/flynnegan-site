@@ -399,6 +399,11 @@ button:active {
   grid-template-columns: minmax(0, 1fr);
 }
 
+/* Lead image alone on the first row; the rest follow in the 2-col grid */
+.gallery-grid:not(.single) > .gallery-item:first-child {
+  grid-column: 1 / -1;
+}
+
 .gallery-item {
   margin: 0;
   cursor: zoom-in;
