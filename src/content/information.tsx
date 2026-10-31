@@ -4,7 +4,6 @@ export function InformationContent() {
       <h1 className="page-heading">Information</h1>
 
       <section className="info-block">
-        <h2>Manifesto &amp; Aesthetic</h2>
         <p>
           <strong>Email:</strong>{" "}
           <a href="mailto:flynnflynn.egan@gmail.com">flynnflynn.egan@gmail.com</a>
@@ -38,6 +37,12 @@ export function InformationContent() {
             flynnflynnegan.bsky.social
           </a>
         </p>
+      </section>
+
+      <hr className="rule" />
+
+      <section className="info-block">
+        <h2>Manifesto &amp; Aesthetic</h2>
         <p>
           Established fine artist with over 15 years of artistic practice across
           installation, graphics, poetry, video art and visual theory. Informed

@@ -41,11 +41,10 @@ export function SideNav({
             href="/contact"
             className={activeSection === "contact" ? "active" : undefined}
           >
-            Contact
-          </Link>{" "}
-          me
+            Contact me
+          </Link>
         </div>
-        <div style={{ marginTop: "1.5rem" }}>
+        <div className="nav-selected">
           <span className="nav-label">Selected</span>
           <br />
           {sections.map((section, index) => (
@@ -54,7 +53,7 @@ export function SideNav({
                 href={`/${section.slug}`}
                 className={activeSection === section.slug ? "active" : undefined}
               >
-                {index + 1}/ {section.title}
+                [{index + 1}] {section.title}
               </Link>
               <br />
             </span>
@@ -63,7 +62,7 @@ export function SideNav({
             href="/commissions"
             className={activeSection === "commissions" ? "active" : undefined}
           >
-            {selectedCount + 1}/ Commissions
+            [{selectedCount + 1}] Commissions
           </Link>
         </div>
       </nav>

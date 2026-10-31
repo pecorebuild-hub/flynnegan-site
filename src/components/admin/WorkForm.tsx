@@ -229,13 +229,19 @@ export function WorkForm({ sections, initial }: Props) {
 
       <div>
         <strong>Photos</strong>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => onUpload(e.target.files)}
-          disabled={uploading}
-        />
+        <label className={`admin-file${uploading ? " is-busy" : ""}`}>
+          <span className="admin-file-btn">
+            {uploading ? "Uploading…" : "Choose photos"}
+          </span>
+          <span className="admin-file-hint">PNG, JPG — multiple allowed</span>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => onUpload(e.target.files)}
+            disabled={uploading}
+          />
+        </label>
         {form.images.map((image, index) => (
           <div
             key={`${image.url}-${index}`}

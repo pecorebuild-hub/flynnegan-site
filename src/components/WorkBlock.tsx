@@ -1,5 +1,6 @@
 import { BackLink } from "./BackLink";
 import { Gallery } from "./Gallery";
+import { TextBlocks } from "./TextBlocks";
 import type { SiteWork } from "@/lib/types";
 
 type Props = {
@@ -25,27 +26,23 @@ export function WorkBlock({ work, sectionSlug }: Props) {
 
       <div className="work-meta">
         {work.series ? (
-          <>
+          <p>
             <span className="work-series-label">Series</span>
             <em className="work-series-name">{work.series}</em>
-            {"\n\n"}
-          </>
+          </p>
         ) : null}
-        {work.description}
-        {work.edition ? `\n\n${work.edition}` : null}
-        {work.longDescription ? `\n\n${work.longDescription}` : null}
+        <TextBlocks text={work.description} />
+        {work.edition ? <p>{work.edition}</p> : null}
+        <TextBlocks text={work.longDescription} />
         {work.buyUrl && priceLabel ? (
-          <>
-            {"\n\n"}
-            <a
-              className="buy-button"
-              href={work.buyUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {priceLabel} Buy ▷
-            </a>
-          </>
+          <a
+            className="buy-button"
+            href={work.buyUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {priceLabel} Buy ▷
+          </a>
         ) : null}
       </div>
 

@@ -4,9 +4,7 @@ export function CommissionsContent() {
       <h1 className="page-heading">Private Commissions</h1>
 
       <p className="lede">
-        Private, custom-crafted digital artwork based on your photo references
-        and personal aesthetic. Each piece is individually rendered in my
-        signature style to capture mood, high-contrast lighting, and character.
+        Private, custom-crafted digital artwork based on your photo references.
       </p>
 
       <section className="commission-tier">
@@ -19,10 +17,12 @@ export function CommissionsContent() {
         <p>
           [1] <strong>Format:</strong> High-resolution digital file (300 DPI,
           ready for print).
-          <br />
+        </p>
+        <p>
           [2] <strong>Process:</strong> Created strictly in my signature style.
           No revisions.
-          <br />
+        </p>
+        <p>
           [3] <strong>Turnaround:</strong> 5–7 business days.
         </p>
         <a
@@ -48,10 +48,12 @@ export function CommissionsContent() {
         <p>
           [1] <strong>Format:</strong> High-resolution digital file (300 DPI,
           suitable for large-format printing).
-          <br />
+        </p>
+        <p>
           [2] <strong>Process:</strong> Created strictly in my signature style.
           No revisions.
-          <br />
+        </p>
+        <p>
           [3] <strong>Turnaround:</strong> 10–14 business days.
         </p>
         <a
@@ -77,10 +79,12 @@ export function CommissionsContent() {
         <p>
           [1] <strong>Format:</strong> High-resolution digital file + 1×
           Hahnemühle Fine Art Print.
-          <br />
+        </p>
+        <p>
           [2] Created strictly in my signature style. No revisions. Global
           trackable shipping included.
-          <br />
+        </p>
+        <p>
           [3] <strong>Turnaround:</strong> 14–21 business days.
         </p>
         <a
@@ -124,7 +128,7 @@ export function CommissionsContent() {
       </section>
 
       <section className="commission-tier">
-        <p className="lede">Contact me:</p>
+        <h2>Contact me</h2>
         <p>
           [1] Bluesky:{" "}
           <a
@@ -134,7 +138,8 @@ export function CommissionsContent() {
           >
             flynnflynnegan.bsky.social
           </a>
-          <br />
+        </p>
+        <p>
           [2] FetLife:{" "}
           <a
             href="https://fetlife.com/Maitre_Flynn"
@@ -143,7 +148,8 @@ export function CommissionsContent() {
           >
             fetlife.com/Maitre_Flynn
           </a>
-          <br />
+        </p>
+        <p>
           [3] Email:{" "}
           <a href="mailto:flynnflynnegan@gmail.com">flynnflynnegan@gmail.com</a>
         </p>

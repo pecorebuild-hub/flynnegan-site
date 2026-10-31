@@ -1,9 +1,7 @@
 export function ContactContent() {
   return (
     <article className="page-prose">
-      <h1 className="page-heading">Contact</h1>
-
-      <p className="lede">Contact me:</p>
+      <h1 className="page-heading">Contact me</h1>
 
       <p>
         [1] Bluesky:{" "}
@@ -14,7 +12,8 @@ export function ContactContent() {
         >
           flynnflynnegan.bsky.social
         </a>
-        <br />
+      </p>
+      <p>
         [2] FetLife:{" "}
         <a
           href="https://fetlife.com/Maitre_Flynn"
@@ -23,7 +22,8 @@ export function ContactContent() {
         >
           fetlife.com/Maitre_Flynn
         </a>
-        <br />
+      </p>
+      <p>
         [3] Email:{" "}
         <a href="mailto:flynnflynnegan@gmail.com">flynnflynnegan@gmail.com</a>
       </p>

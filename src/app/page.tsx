@@ -23,7 +23,7 @@ export default async function HomePage() {
       {latest.length === 0 ? (
         <p className="lede">No works yet.</p>
       ) : (
-        <div className="latest-grid">
+        <div className="latest-masonry">
           {latest.map((work) => {
             const cover = [...work.images].sort(
               (a, b) => a.sortOrder - b.sortOrder,
@@ -43,9 +43,6 @@ export default async function HomePage() {
                 )}
                 <div className="latest-meta">
                   <h2 className="work-title">{work.title}</h2>
-                  {work.series ? (
-                    <p className="work-series-name">{work.series}</p>
-                  ) : null}
                 </div>
               </Link>
             );

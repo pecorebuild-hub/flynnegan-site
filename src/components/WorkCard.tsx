@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BackLink } from "./BackLink";
+import { TextBlocks } from "./TextBlocks";
 import type { SiteWork } from "@/lib/types";
 
 type Props = {
@@ -9,6 +10,11 @@ type Props = {
 export function WorkCard({ work }: Props) {
   const cover = [...work.images].sort((a, b) => a.sortOrder - b.sortOrder)[0];
   const href = `/${work.sectionSlug}/${work.slug}`;
+  const priceLabel = work.price
+    ? work.price.startsWith("$")
+      ? work.price
+      : `$${work.price}`
+    : null;
 
   return (
     <article className="work-card">
@@ -22,15 +28,18 @@ export function WorkCard({ work }: Props) {
       </div>
 
       <div className="work-meta">
-        {work.series ? (
-          <>
-            <span className="work-series-label">Series</span>
-            <em className="work-series-name">{work.series}</em>
-            {"\n\n"}
-          </>
+        <TextBlocks text={work.description} />
+        {work.edition ? <p>{work.edition}</p> : null}
+        {work.buyUrl && priceLabel ? (
+          <a
+            className="buy-button"
+            href={work.buyUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {priceLabel} Buy ▷
+          </a>
         ) : null}
-        {work.description}
-        {work.edition ? `\n\n${work.edition}` : null}
       </div>
 
       {cover ? (
