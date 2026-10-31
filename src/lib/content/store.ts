@@ -85,15 +85,62 @@ function seedToContent(seed: SeedFile): SiteContent {
   return { sections, works, site: seed.site };
 }
 
+const BLOB_CONTENT_PATH = "content/site.json";
+
+async function readBlobContent(): Promise<SiteContent | null> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
+  try {
+    const { list } = await import("@vercel/blob");
+    const result = await list({
+      prefix: BLOB_CONTENT_PATH,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+    const blob = result.blobs.find((item) => item.pathname === BLOB_CONTENT_PATH);
+    if (!blob) return null;
+    const response = await fetch(blob.url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return (await response.json()) as SiteContent;
+  } catch {
+    return null;
+  }
+}
+
+async function writeBlobContent(content: SiteContent): Promise<boolean> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return false;
+  const { put } = await import("@vercel/blob");
+  await put(BLOB_CONTENT_PATH, JSON.stringify(content, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json",
+    token: process.env.BLOB_READ_WRITE_TOKEN,
+  });
+  return true;
+}
+
+async function loadSeedContent(): Promise<SiteContent> {
+  const seed = await readJson<SeedFile>(SEED_PATH);
+  return seedToContent(seed);
+}
+
 export async function ensureContent(): Promise<SiteContent> {
+  const fromBlob = await readBlobContent();
+  if (fromBlob) return fromBlob;
+
   try {
     await fs.access(CONTENT_PATH);
     return readJson<SiteContent>(CONTENT_PATH);
   } catch {
-    const seed = await readJson<SeedFile>(SEED_PATH);
-    const content = seedToContent(seed);
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
+    const content = await loadSeedContent();
+    try {
+      await fs.mkdir(DATA_DIR, { recursive: true });
+      await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
+    } catch {
+      // read-only FS (e.g. Vercel) — return seed in-memory
+    }
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      await writeBlobContent(content);
+    }
     return content;
   }
 }
@@ -103,8 +150,17 @@ export async function readContent(): Promise<SiteContent> {
 }
 
 export async function writeContent(content: SiteContent): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
+  const wroteBlob = await writeBlobContent(content);
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
+  } catch {
+    if (!wroteBlob) {
+      throw new Error(
+        "Cannot persist content: set BLOB_READ_WRITE_TOKEN for Vercel or use a writable filesystem locally.",
+      );
+    }
+  }
 }
 
 export async function getNavSections() {
