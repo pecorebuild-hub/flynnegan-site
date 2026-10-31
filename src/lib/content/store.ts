@@ -1,5 +1,10 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { hasDatabase } from "@/lib/db";
+import {
+  readDbDocument,
+  writeDbDocument,
+} from "@/lib/content/db-document";
 import type { SiteContent, SiteSection, SiteWork, SiteWorkImage } from "../types";
 import { slugify } from "../slug";
 
@@ -327,24 +332,62 @@ async function loadSeedContent(): Promise<SiteContent> {
 }
 
 /**
- * Read live content. Never auto-writes seed into Blob — that wiped user works
- * when a deploy/build hit a transient Blob miss.
+ * Read live content.
+ * Source of truth: Postgres (Neon) when DATABASE_URL is set.
+ * Blob/local are backup/dev fallbacks — never auto-write seed into DB/Blob.
  */
 export async function ensureContent(): Promise<SiteContent> {
+  if (hasDatabase()) {
+    try {
+      const fromDb = await readDbDocument();
+      if (fromDb) return normalizeContent(fromDb);
+
+      // First boot: prefer existing Blob catalogue over seed.
+      const fromBlob = await readBlobContent();
+      if (fromBlob.status === "ok") {
+        const migrated = normalizeContent(fromBlob.content);
+        if (!isBuildPhase()) {
+          await writeDbDocument(migrated);
+        }
+        return migrated;
+      }
+
+      try {
+        await fs.access(CONTENT_PATH);
+        const local = normalizeContent(await readJson<SiteContent>(CONTENT_PATH));
+        if (!isBuildPhase()) {
+          await writeDbDocument(local);
+        }
+        return local;
+      } catch {
+        const seed = await loadSeedContent();
+        // Only persist seed when DB is truly empty (first install).
+        if (!isBuildPhase()) {
+          await writeDbDocument(seed);
+        }
+        return seed;
+      }
+    } catch (error) {
+      if (isNextDynamicBailout(error)) throw error;
+      if (isBuildPhase()) {
+        return loadSeedContent();
+      }
+      throw error;
+    }
+  }
+
   const fromBlob = await readBlobContent();
   if (fromBlob.status === "ok") return normalizeContent(fromBlob.content);
   if (fromBlob.status === "error") {
-    // Prefer local file over silently falling back to seed on prod.
     try {
       await fs.access(CONTENT_PATH);
       return normalizeContent(await readJson<SiteContent>(CONTENT_PATH));
     } catch {
-      // During build, serve seed in-memory only — never persist it.
       if (isBuildPhase()) {
         return loadSeedContent();
       }
       throw new Error(
-        `Cannot read site content from Blob (${fromBlob.message}). Refusing to overwrite with seed.`,
+        `Cannot read site content from Blob (${fromBlob.message}). Set DATABASE_URL.`,
       );
     }
   }
@@ -353,8 +396,6 @@ export async function ensureContent(): Promise<SiteContent> {
     await fs.access(CONTENT_PATH);
     return normalizeContent(await readJson<SiteContent>(CONTENT_PATH));
   } catch {
-    // First boot / empty store: serve seed in-memory (and locally if writable).
-    // Do NOT push seed to Blob — that only happens via explicit resetFromSeed().
     const content = await loadSeedContent();
     if (!isBuildPhase()) {
       try {
@@ -365,7 +406,7 @@ export async function ensureContent(): Promise<SiteContent> {
           "utf8",
         );
       } catch {
-        // read-only FS (e.g. Vercel)
+        // read-only FS
       }
     }
     return content;
@@ -380,15 +421,49 @@ export async function writeContent(
   content: SiteContent,
   options?: { allowSeedOverwrite?: boolean },
 ): Promise<void> {
-  const wroteBlob = await writeBlobContent(content, options);
   if (isBuildPhase()) return;
+
+  if (hasDatabase()) {
+    const current = await readDbDocument();
+    if (current && !options?.allowSeedOverwrite) {
+      const currentCount = current.works?.length ?? 0;
+      const nextCount = content.works?.length ?? 0;
+      if (currentCount > nextCount && nextCount <= 4) {
+        const seed = await loadSeedContent();
+        const looksLikeSeed =
+          nextCount === seed.works.length &&
+          content.works.every((work, i) => work.slug === seed.works[i]?.slug);
+        if (looksLikeSeed) {
+          throw new Error(
+            `Refusing to overwrite ${currentCount} works with seed (${nextCount}). Use Reset from seed.json explicitly.`,
+          );
+        }
+      }
+    }
+    await writeDbDocument(content);
+    // Best-effort Blob mirror for offline recovery — never the source of truth.
+    try {
+      await writeBlobContent(content, { allowSeedOverwrite: true });
+    } catch {
+      // DB write already succeeded.
+    }
+    try {
+      await fs.mkdir(DATA_DIR, { recursive: true });
+      await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
+    } catch {
+      // optional local mirror
+    }
+    return;
+  }
+
+  const wroteBlob = await writeBlobContent(content, options);
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
     await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
   } catch {
     if (!wroteBlob) {
       throw new Error(
-        "Cannot persist content: set BLOB_READ_WRITE_TOKEN for Vercel or use a writable filesystem locally.",
+        "Cannot persist content: set DATABASE_URL (Neon) or BLOB_READ_WRITE_TOKEN.",
       );
     }
   }

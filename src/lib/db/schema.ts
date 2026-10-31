@@ -1,12 +1,27 @@
 import {
   boolean,
   integer,
+  jsonb,
   pgTable,
   serial,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+import type { SiteContent } from "../types";
 
+/**
+ * Canonical site catalogue as one JSON document.
+ * Atomic upserts — no more whole-file wipes from seed/deploy races.
+ */
+export const siteDocuments = pgTable("site_documents", {
+  id: text("id").primaryKey(),
+  content: jsonb("content").$type<SiteContent>().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+/** Kept for future normalized queries; not used by the content store yet. */
 export const sections = pgTable("sections", {
   id: serial("id").primaryKey(),
   slug: text("slug").notNull().unique(),
@@ -49,6 +64,8 @@ export const workImages = pgTable("work_images", {
   workId: integer("work_id")
     .notNull()
     .references(() => works.id, { onDelete: "cascade" }),
+  /** "primary" | "alt" */
+  kind: text("kind").notNull().default("primary"),
   url: text("url").notNull(),
   caption: text("caption"),
   sortOrder: integer("sort_order").notNull().default(0),
