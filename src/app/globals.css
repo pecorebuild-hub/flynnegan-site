@@ -24,37 +24,21 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "IM Fell English";
-  src: url("/fonts/IMFellEnglish-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "IM Fell English";
-  src: url("/fonts/IMFellEnglish-Italic.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
 :root {
   --bg: #191919;
   --fg: rgba(255, 255, 255, 0.85);
   --muted: rgba(255, 255, 255, 0.4);
   --soft: rgba(255, 255, 255, 0.75);
   --faint: rgba(255, 255, 255, 0.25);
-  --font-display: "IM Fell English", Georgia, serif;
+  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
   --font-body: "Bricolage Grotesque", system-ui, sans-serif;
-  --nav-width: clamp(18rem, 24vw, 26rem);
+  --nav-width: clamp(22rem, 30vw, 34rem);
   --page-pad: clamp(1.25rem, 2.8vw, 2.5rem);
-}
-
-html[data-font="bricolage-fell"] {
-  --font-display: "IM Fell English", Georgia, serif;
-  --font-body: "Bricolage Grotesque", system-ui, sans-serif;
+  --text-h1: clamp(3.75rem, 8vw, 6.5rem);
+  --text-h2: clamp(1.85rem, 2.6vw, 2.35rem);
+  --text-h3: clamp(1.55rem, 2.15vw, 1.95rem);
+  --text-body: clamp(1.2rem, 1.55vw, 1.4rem);
+  --text-lede: clamp(1.3rem, 1.75vw, 1.55rem);
 }
 
 html[data-font="bricolage"] {
@@ -70,11 +54,6 @@ html[data-font="geist"] {
 html[data-font="geist-mono"] {
   --font-display: "Geist", system-ui, sans-serif;
   --font-body: "Geist Mono", ui-monospace, monospace;
-}
-
-html[data-font="fell"] {
-  --font-display: "IM Fell English", Georgia, serif;
-  --font-body: "Bricolage Grotesque", system-ui, sans-serif;
 }
 
 @theme inline {
@@ -141,24 +120,25 @@ button:active {
 
 .brand {
   font-family: var(--font-display);
-  font-size: clamp(1.85rem, 2.4vw, 2.45rem);
-  line-height: 1.12;
-  font-weight: 400;
+  font-size: clamp(2rem, 2.6vw, 2.65rem);
+  line-height: 1.1;
+  font-weight: 520;
+  letter-spacing: -0.02em;
 }
 
 .brand-muted {
   font-family: var(--font-body);
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   line-height: 1.4;
-  margin-top: 0.55rem;
-  max-width: 18rem;
+  margin-top: 0.65rem;
+  max-width: 22rem;
 }
 
 .nav-block {
   font-family: var(--font-body);
-  font-size: 1.2rem;
-  line-height: 1.6;
+  font-size: 1.3rem;
+  line-height: 1.65;
   font-weight: 420;
 }
 
@@ -191,20 +171,22 @@ button:active {
 .work-title,
 .work-index {
   font-family: var(--font-display);
-  font-size: clamp(1.55rem, 2.2vw, 2rem);
-  line-height: 1.25;
-  font-weight: 400;
+  font-size: var(--text-h2);
+  line-height: 1.2;
+  font-weight: 520;
+  letter-spacing: -0.015em;
   margin: 0;
 }
 
 .work-index a {
   color: var(--soft);
+  font-weight: 420;
 }
 
 .work-meta {
   font-family: var(--font-body);
-  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
-  line-height: 1.45;
+  font-size: var(--text-body);
+  line-height: 1.5;
   font-weight: 420;
   margin: 0 0 1.25rem;
   white-space: pre-wrap;
@@ -213,14 +195,17 @@ button:active {
 .work-series-label {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 1.8vw, 1.7rem);
+  font-size: var(--text-h3);
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .work-series-name {
   color: var(--muted);
   font-style: italic;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 1.8vw, 1.7rem);
+  font-size: var(--text-h3);
+  font-weight: 450;
 }
 
 .buy-button {
@@ -228,8 +213,8 @@ button:active {
   margin-top: 1rem;
   color: var(--fg);
   font-family: var(--font-body);
-  font-size: clamp(1.35rem, 1.8vw, 1.75rem);
-  font-weight: 480;
+  font-size: var(--text-h3);
+  font-weight: 500;
   line-height: 1;
   border: 0.2rem solid rgba(255, 255, 255, 0.85);
   border-radius: 0;
@@ -483,15 +468,16 @@ button:active {
 
 .page-heading {
   font-family: var(--font-display);
-  font-size: clamp(2.6rem, 5vw, 4.2rem);
-  line-height: 1.05;
-  font-weight: 400;
+  font-size: var(--text-h1);
+  line-height: 0.98;
+  font-weight: 560;
+  letter-spacing: -0.035em;
   margin: 0 0 1.5rem;
 }
 
 .lede {
   font-family: var(--font-body);
-  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+  font-size: var(--text-lede);
   color: var(--soft);
   line-height: 1.45;
   margin: 0 0 1.75rem;
@@ -499,17 +485,35 @@ button:active {
 
 .page-prose h2 {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2vw, 1.9rem);
-  font-weight: 400;
+  font-size: var(--text-h2);
+  font-weight: 520;
+  letter-spacing: -0.015em;
   margin: 0 0 0.75rem;
+}
+
+.page-prose h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.65rem;
 }
 
 .page-prose p,
 .page-prose li {
   font-family: var(--font-body);
-  font-size: clamp(1.05rem, 1.35vw, 1.2rem);
-  line-height: 1.5;
+  font-size: var(--text-body);
+  line-height: 1.55;
   color: var(--soft);
+}
+
+.home-latest-label {
+  font-family: var(--font-body);
+  font-size: var(--text-h3);
+  color: var(--muted);
+  margin: 0 0 1.75rem;
+  font-weight: 450;
+  letter-spacing: -0.01em;
 }
 
 .page-prose ol {

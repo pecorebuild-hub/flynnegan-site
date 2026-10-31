@@ -192,6 +192,15 @@ export async function getAllWorks() {
   return content.works.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
+/** Newest first by id (auto-increment on create). */
+export async function getLatestWorks(limit = 6) {
+  const content = await readContent();
+  return content.works
+    .filter((w) => w.published)
+    .sort((a, b) => b.id - a.id)
+    .slice(0, limit);
+}
+
 export async function getSiteMeta() {
   const content = await readContent();
   return content.site;
