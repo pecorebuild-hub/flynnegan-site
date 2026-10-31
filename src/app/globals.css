@@ -708,6 +708,30 @@ button:active {
   font-size: 0.9rem;
 }
 
+.admin-upload-progress {
+  margin-top: 0.65rem;
+}
+
+.admin-upload-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e5e5;
+  overflow: hidden;
+}
+
+.admin-upload-bar > span {
+  display: block;
+  height: 100%;
+  background: #111;
+  transition: width 0.15s ease-out;
+}
+
+.admin-upload-status {
+  margin: 0.4rem 0 0;
+  color: #555;
+  font-size: 0.85rem;
+}
+
 .page-prose {
   max-width: 42rem;
 }

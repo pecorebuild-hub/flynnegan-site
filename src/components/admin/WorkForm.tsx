@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { uploadAdminImage } from "@/lib/admin-upload";
 
 type Section = { id: number; title: string };
 type ImageRow = { url: string; caption: string; sortOrder: number; id?: number };
@@ -67,6 +68,8 @@ export function WorkForm({ sections, initial }: Props) {
   const [prodigiInfo, setProdigiInfo] = useState("");
   const [altProdigiInfo, setAltProdigiInfo] = useState("");
   const [uploading, setUploading] = useState<"primary" | "alt" | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadLabel, setUploadLabel] = useState("");
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -77,26 +80,39 @@ export function WorkForm({ sections, initial }: Props) {
     target: "images" | "altImages",
   ) {
     if (!fileList?.length) return;
+    const files = Array.from(fileList);
+    setError("");
     setUploading(target === "images" ? "primary" : "alt");
+    setUploadProgress(0);
+
     const nextImages = [...form[target]];
-    for (const file of Array.from(fileList)) {
-      const body = new FormData();
-      body.append("file", file);
-      const response = await fetch("/api/admin/upload", {
-        method: "POST",
-        body,
-      });
-      const data = await response.json();
-      if (response.ok) {
+    try {
+      for (let i = 0; i < files.length; i += 1) {
+        const file = files[i];
+        setUploadLabel(
+          files.length > 1
+            ? `${file.name} (${i + 1}/${files.length})`
+            : file.name,
+        );
+        const url = await uploadAdminImage(file, (percent) => {
+          const overall =
+            ((i + percent / 100) / files.length) * 100;
+          setUploadProgress(Math.round(overall));
+        });
         nextImages.push({
-          url: data.url,
+          url,
           caption: "",
           sortOrder: nextImages.length,
         });
+        update(target, [...nextImages]);
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(null);
+      setUploadProgress(0);
+      setUploadLabel("");
     }
-    update(target, nextImages);
-    setUploading(null);
   }
 
   async function lookupProdigi(kind: "primary" | "alt") {
@@ -179,23 +195,39 @@ export function WorkForm({ sections, initial }: Props) {
   }
 
   function renderImageList(target: "images" | "altImages") {
-    const busy = uploading === (target === "images" ? "primary" : "alt");
+    const kind = target === "images" ? "primary" : "alt";
+    const busy = uploading === kind;
     return (
       <div>
         <strong>{target === "images" ? "Photos" : "Alternate photos"}</strong>
         <label className={`admin-file${busy ? " is-busy" : ""}`}>
           <span className="admin-file-btn">
-            {busy ? "Uploading…" : "Choose photos"}
+            {busy ? `Uploading ${uploadProgress}%` : "Choose photos"}
           </span>
-          <span className="admin-file-hint">PNG, JPG — multiple allowed</span>
+          <span className="admin-file-hint">
+            PNG, JPG, WebP — up to ~100 MB (direct to Blob)
+          </span>
           <input
             type="file"
             accept="image/*"
             multiple
-            onChange={(e) => onUpload(e.target.files, target)}
+            onChange={(e) => {
+              void onUpload(e.target.files, target);
+              e.target.value = "";
+            }}
             disabled={Boolean(uploading)}
           />
         </label>
+        {busy ? (
+          <div className="admin-upload-progress" aria-live="polite">
+            <div className="admin-upload-bar">
+              <span style={{ width: `${uploadProgress}%` }} />
+            </div>
+            <p className="admin-upload-status">
+              {uploadLabel || "Uploading…"} — {uploadProgress}%
+            </p>
+          </div>
+        ) : null}
         {form[target].map((image, index) => (
           <div key={`${target}-${image.url}-${index}`} className="admin-image-row">
             {/* eslint-disable-next-line @next/next/no-img-element */}
