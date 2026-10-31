@@ -12,23 +12,16 @@ export default async function HomePage() {
       brandTitle={site.title}
       tagline={site.tagline}
     >
-      <section style={{ maxWidth: "38rem", paddingTop: "12vh" }}>
-        <h1
-          className="brand"
-          style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: 0 }}
-        >
+      <section style={{ maxWidth: "40rem", paddingTop: "10vh" }}>
+        <h1 className="page-heading" style={{ marginBottom: "1rem" }}>
           {site.title}
         </h1>
-        <p style={{ color: "var(--muted)", marginTop: "1rem", fontSize: "1.1rem" }}>
+        <p className="lede" style={{ margin: 0 }}>
           {site.description}
         </p>
         {first ? (
-          <p style={{ marginTop: "2rem" }}>
-            <Link
-              href={`/${first.slug}`}
-              className="buy-button"
-              style={{ textDecoration: "underline", textUnderlineOffset: "0.2em" }}
-            >
+          <p style={{ marginTop: "2.25rem" }}>
+            <Link className="buy-button" href={`/${first.slug}`}>
               Enter gallery ▷
             </Link>
           </p>

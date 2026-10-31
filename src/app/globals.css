@@ -46,10 +46,15 @@
   --muted: rgba(255, 255, 255, 0.4);
   --soft: rgba(255, 255, 255, 0.75);
   --faint: rgba(255, 255, 255, 0.25);
-  --font-display: "Geist", system-ui, sans-serif;
-  --font-body: "Geist", system-ui, sans-serif;
-  --nav-width: 15rem;
-  --page-pad: clamp(1rem, 2.5vw, 2rem);
+  --font-display: "IM Fell English", Georgia, serif;
+  --font-body: "Bricolage Grotesque", system-ui, sans-serif;
+  --nav-width: clamp(18rem, 24vw, 26rem);
+  --page-pad: clamp(1.25rem, 2.8vw, 2.5rem);
+}
+
+html[data-font="bricolage-fell"] {
+  --font-display: "IM Fell English", Georgia, serif;
+  --font-body: "Bricolage Grotesque", system-ui, sans-serif;
 }
 
 html[data-font="bricolage"] {
@@ -69,7 +74,7 @@ html[data-font="geist-mono"] {
 
 html[data-font="fell"] {
   --font-display: "IM Fell English", Georgia, serif;
-  --font-body: "Geist", system-ui, sans-serif;
+  --font-body: "Bricolage Grotesque", system-ui, sans-serif;
 }
 
 @theme inline {
@@ -136,21 +141,25 @@ button:active {
 
 .brand {
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2vw, 1.75rem);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  font-size: clamp(1.85rem, 2.4vw, 2.45rem);
+  line-height: 1.12;
+  font-weight: 400;
 }
 
 .brand-muted {
+  font-family: var(--font-body);
   color: var(--muted);
   font-size: 0.95rem;
-  margin-top: 0.35rem;
+  line-height: 1.4;
+  margin-top: 0.55rem;
+  max-width: 18rem;
 }
 
 .nav-block {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  line-height: 1.55;
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  line-height: 1.6;
+  font-weight: 420;
 }
 
 .nav-block a {
@@ -180,11 +189,10 @@ button:active {
 }
 
 .work-title,
-.work-index,
-.work-meta {
+.work-index {
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
-  line-height: 1.35;
+  font-size: clamp(1.55rem, 2.2vw, 2rem);
+  line-height: 1.25;
   font-weight: 400;
   margin: 0;
 }
@@ -194,25 +202,40 @@ button:active {
 }
 
 .work-meta {
-  margin-bottom: 1.25rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  line-height: 1.45;
+  font-weight: 420;
+  margin: 0 0 1.25rem;
   white-space: pre-wrap;
 }
 
 .work-series-label {
   display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.8vw, 1.7rem);
 }
 
 .work-series-name {
   color: var(--muted);
   font-style: italic;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.8vw, 1.7rem);
 }
 
 .buy-button {
   display: inline-block;
-  margin-top: 0.75rem;
+  margin-top: 1rem;
   color: var(--fg);
-  font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-family: var(--font-body);
+  font-size: clamp(1.35rem, 1.8vw, 1.75rem);
+  font-weight: 480;
+  line-height: 1;
+  border: 0.2rem solid rgba(255, 255, 255, 0.85);
+  border-radius: 0;
+  padding: 0.8rem 1rem;
+  text-decoration: none;
+  background: transparent;
 }
 
 .buy-button:hover {
@@ -417,6 +440,72 @@ button:active {
   padding: 0.5rem;
   text-align: left;
   vertical-align: top;
+}
+
+.page-prose {
+  max-width: 42rem;
+}
+
+.page-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  line-height: 1.05;
+  font-weight: 400;
+  margin: 0 0 1.5rem;
+}
+
+.lede {
+  font-family: var(--font-body);
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+  color: var(--soft);
+  line-height: 1.45;
+  margin: 0 0 1.75rem;
+}
+
+.page-prose h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2vw, 1.9rem);
+  font-weight: 400;
+  margin: 0 0 0.75rem;
+}
+
+.page-prose p,
+.page-prose li {
+  font-family: var(--font-body);
+  font-size: clamp(1.05rem, 1.35vw, 1.2rem);
+  line-height: 1.5;
+  color: var(--soft);
+}
+
+.page-prose ol {
+  margin: 0.5rem 0 1.25rem;
+  padding-left: 1.25rem;
+}
+
+.page-prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.page-prose .buy-button {
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+
+.commission-tier {
+  margin-bottom: 1.75rem;
+}
+
+.rule {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  margin: 2rem 0;
+}
+
+.muted-note {
+  color: var(--muted) !important;
+  font-size: 0.95rem !important;
+  margin-top: 2rem;
 }
 
 @media (max-width: 860px) {

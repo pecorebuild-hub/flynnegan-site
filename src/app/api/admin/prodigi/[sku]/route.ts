@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
+import { summarizeProdigiProduct } from "@/lib/prodigi";
 
 type Props = {
   params: Promise<{ sku: string }>;
@@ -19,7 +20,7 @@ export async function GET(_request: Request, { params }: Props) {
   }
 
   const base =
-    process.env.PRODIGI_API_BASE || "https://api.sandbox.prodigi.com/v4.0";
+    process.env.PRODIGI_API_BASE || "https://api.prodigi.com/v4.0";
   const response = await fetch(`${base}/products/${encodeURIComponent(sku)}`, {
     headers: { "X-API-Key": apiKey },
     cache: "no-store",
@@ -29,5 +30,7 @@ export async function GET(_request: Request, { params }: Props) {
   if (!response.ok) {
     return NextResponse.json(data, { status: response.status });
   }
-  return NextResponse.json(data);
+
+  const summary = summarizeProdigiProduct(data.product || {});
+  return NextResponse.json({ ...data, summary });
 }

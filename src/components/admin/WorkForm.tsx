@@ -83,10 +83,19 @@ export function WorkForm({ sections, initial }: Props) {
       setProdigiInfo(data.error || "Lookup failed");
       return;
     }
-    const product = data.product;
-    setProdigiInfo(
-      `${product?.description || ""} · ${product?.productDimensions?.width}×${product?.productDimensions?.height} ${product?.productDimensions?.units || ""}`,
-    );
+    const summary = data.summary;
+    setProdigiInfo(summary?.summary || "No details");
+    if (summary?.sizeLine) {
+      const sizeLine = summary.sizeLine as string;
+      setForm((prev) => {
+        const current = prev.description || "";
+        if (current.includes(sizeLine)) return prev;
+        const next = current.trim()
+          ? `${current.trim()}\n${sizeLine}`
+          : sizeLine;
+        return { ...prev, description: next };
+      });
+    }
   }
 
   async function onSubmit(event: FormEvent) {
@@ -176,12 +185,12 @@ export function WorkForm({ sections, initial }: Props) {
         />
       </label>
       <label>
-        Prodigi SKU (optional carrier)
+        Prodigi SKU (size is in the SKU, e.g. MOU-DI-20X30 = 20×30)
         <div style={{ display: "flex", gap: "0.5rem" }}>
           <input
             value={form.prodigiSku}
             onChange={(e) => update("prodigiSku", e.target.value)}
-            placeholder="GLOBAL-CAN-10X10"
+            placeholder="MOU-DI-20X30 or GLOBAL-CAN-10X10"
           />
           <button
             className="admin-btn secondary"
@@ -192,7 +201,9 @@ export function WorkForm({ sections, initial }: Props) {
           </button>
         </div>
       </label>
-      {prodigiInfo ? <p style={{ color: "#555" }}>{prodigiInfo}</p> : null}
+      {prodigiInfo ? (
+        <p style={{ color: "#555", whiteSpace: "pre-wrap" }}>{prodigiInfo}</p>
+      ) : null}
 
       <div>
         <strong>Photos</strong>

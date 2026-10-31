@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { readContent } from "@/lib/content/store";
+import { readContent, resetFromSeed } from "@/lib/content/store";
+
+async function resetSeedAction() {
+  "use server";
+  if (!(await isAdminAuthenticated())) redirect("/admin/login");
+  await resetFromSeed();
+  redirect("/admin");
+}
 
 export default async function AdminDashboardPage() {
   if (!(await isAdminAuthenticated())) redirect("/admin/login");
@@ -17,7 +24,7 @@ export default async function AdminDashboardPage() {
         <p>
           Works: <strong>{content.works.length}</strong>
         </p>
-        <p style={{ marginTop: "1rem", display: "flex", gap: "0.75rem" }}>
+        <p style={{ marginTop: "1rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
           <Link className="admin-btn" href="/admin/works/new">
             Add work
           </Link>
@@ -27,6 +34,11 @@ export default async function AdminDashboardPage() {
           <Link className="admin-btn secondary" href="/preview/fonts">
             Font previews
           </Link>
+          <form action={resetSeedAction}>
+            <button className="admin-btn secondary" type="submit">
+              Reset from seed.json
+            </button>
+          </form>
         </p>
       </div>
     </>

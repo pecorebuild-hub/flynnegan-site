@@ -51,3 +51,6 @@ next-env.d.ts
 
 # original font downloads (runtime fonts are in public/fonts)
 /fonts/
+
+.vercel
+.env*

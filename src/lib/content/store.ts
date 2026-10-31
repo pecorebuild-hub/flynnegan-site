@@ -337,6 +337,12 @@ export async function deleteWork(id: number) {
   await writeContent(content);
 }
 
+export async function resetFromSeed() {
+  const content = await loadSeedContent();
+  await writeContent(content);
+  return content;
+}
+
 export async function createWorksBatch(input: {
   sectionId: number;
   series?: string | null;

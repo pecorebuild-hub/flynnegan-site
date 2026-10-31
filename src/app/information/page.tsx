@@ -1,4 +1,5 @@
 import { SiteShell } from "@/components/SiteShell";
+import { InformationContent } from "@/content/information";
 import { getNavSections, getSiteMeta } from "@/lib/content/store";
 
 export default async function InformationPage() {
@@ -7,15 +8,11 @@ export default async function InformationPage() {
   return (
     <SiteShell
       sections={sections}
+      activeSection="information"
       brandTitle={site.title}
       tagline={site.tagline}
     >
-      <article style={{ maxWidth: "40rem" }}>
-        <h1 className="work-title" style={{ marginBottom: "1.5rem" }}>
-          Information
-        </h1>
-        <div className="work-meta">{site.description}</div>
-      </article>
+      <InformationContent />
     </SiteShell>
   );
 }

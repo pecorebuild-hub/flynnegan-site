@@ -32,16 +32,18 @@ export function WorkBlock({ work, sectionSlug }: Props) {
           </>
         ) : null}
         {work.description}
-        {"\n\n"}
         {work.buyUrl && priceLabel ? (
-          <a
-            className="buy-button"
-            href={work.buyUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {priceLabel} Buy ▷
-          </a>
+          <>
+            {"\n\n"}
+            <a
+              className="buy-button"
+              href={work.buyUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {priceLabel} Buy ▷
+            </a>
+          </>
         ) : null}
       </div>
 

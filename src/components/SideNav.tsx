@@ -14,6 +14,8 @@ export function SideNav({
   brandTitle,
   tagline,
 }: Props) {
+  const selectedCount = sections.length;
+
   return (
     <aside className="site-nav">
       <div>
@@ -25,11 +27,22 @@ export function SideNav({
 
       <nav className="nav-block" aria-label="Primary">
         <div>
-          <Link href="/information">Information</Link>
+          <Link
+            href="/information"
+            className={activeSection === "information" ? "active" : undefined}
+          >
+            Information
+          </Link>
           <br />
-          <Link href="/contact">Contact</Link> me
+          <Link
+            href="/contact"
+            className={activeSection === "contact" ? "active" : undefined}
+          >
+            Contact
+          </Link>{" "}
+          me
         </div>
-        <div style={{ marginTop: "1.25rem" }}>
+        <div style={{ marginTop: "1.5rem" }}>
           <span className="nav-label">Selected</span>
           <br />
           {sections.map((section, index) => (
@@ -47,7 +60,7 @@ export function SideNav({
             href="/commissions"
             className={activeSection === "commissions" ? "active" : undefined}
           >
-            Commissions
+            {selectedCount + 1}/ Commissions
           </Link>
         </div>
       </nav>
