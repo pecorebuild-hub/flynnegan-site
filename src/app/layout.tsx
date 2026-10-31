@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { JsonLd } from "@/components/JsonLd";
 import { DEFAULT_FONT_VARIANT } from "@/lib/fonts";
@@ -11,7 +12,7 @@ import {
   websiteJsonLd,
 } from "@/lib/seo";
 
-/** Content lives in Vercel Blob — never bake seed into a static build. */
+/** Content lives in Neon — never bake seed into a static build. */
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -71,6 +72,7 @@ export default function RootLayout({
         <JsonLd data={personJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
         {children}
+        <Analytics />
       </body>
     </html>
   );
