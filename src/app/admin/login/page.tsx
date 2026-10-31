@@ -29,23 +29,25 @@ export default function AdminLoginPage() {
 
   return (
     <div className="admin-shell">
-      <h1>Admin login</h1>
-      <form className="admin-form admin-card" onSubmit={onSubmit}>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoFocus
-            required
-          />
-        </label>
-        {error ? <p style={{ color: "#b00020" }}>{error}</p> : null}
-        <button type="submit" disabled={loading}>
-          {loading ? "…" : "Enter"}
-        </button>
-      </form>
+      <div className="admin-shell-inner">
+        <h1>Admin login</h1>
+        <form className="admin-form admin-card" onSubmit={onSubmit}>
+          <label>
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoFocus
+              required
+            />
+          </label>
+          {error ? <p style={{ color: "#b00020" }}>{error}</p> : null}
+          <button type="submit" disabled={loading}>
+            {loading ? "…" : "Enter"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

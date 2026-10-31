@@ -371,24 +371,41 @@ button:active {
 }
 
 .admin-shell {
-  max-width: 960px;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
   padding: 2rem 1.25rem 4rem;
   color: #111;
-  background: #f4f4f4;
-  min-height: 100vh;
-  font-family: system-ui, sans-serif;
+  background: #f3f3f3;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.admin-shell-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.admin-shell,
+.admin-shell * {
+  color: #111;
 }
 
 .admin-shell a {
   color: #111;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.admin-shell header a {
+  text-decoration: none;
 }
 
 .admin-card {
-  background: white;
+  background: #fff;
   border: 1px solid #ddd;
   padding: 1rem;
   margin-bottom: 1rem;
+  color: #111;
 }
 
 .admin-form {
@@ -400,15 +417,18 @@ button:active {
   display: grid;
   gap: 0.25rem;
   font-size: 0.9rem;
+  color: #111;
 }
 
 .admin-form input,
 .admin-form textarea,
 .admin-form select {
   padding: 0.5rem 0.6rem;
-  border: 1px solid #ccc;
+  border: 1px solid #bbb;
   border-radius: 4px;
   font: inherit;
+  color: #111;
+  background: #fff;
 }
 
 .admin-form button,
@@ -416,16 +436,31 @@ button:active {
   appearance: none;
   border: 1px solid #111;
   background: #111;
-  color: white;
+  color: #fff !important;
   padding: 0.55rem 0.9rem;
   cursor: pointer;
   font: inherit;
   width: fit-content;
+  border-radius: 4px;
 }
 
-.admin-btn.secondary {
-  background: white;
-  color: #111;
+.admin-form button:hover,
+.admin-btn:hover {
+  background: #333;
+  color: #fff !important;
+}
+
+.admin-btn.secondary,
+.admin-form button.secondary {
+  background: #fff !important;
+  color: #111 !important;
+  border-color: #111;
+}
+
+.admin-btn.secondary:hover,
+.admin-form button.secondary:hover {
+  background: #eee !important;
+  color: #111 !important;
 }
 
 .admin-table {
@@ -492,8 +527,13 @@ button:active {
   margin-bottom: 0.5rem;
 }
 
-.commission-tier {
+.commission-tier,
+.info-block {
   margin-bottom: 1.75rem;
+}
+
+.info-block p {
+  margin: 0 0 1rem;
 }
 
 .rule {

@@ -36,30 +36,32 @@ export default async function AdminLayout({
 
   return (
     <div className="admin-shell">
-      <header
-        style={{
-          display: "flex",
-          gap: "1rem",
-          flexWrap: "wrap",
-          alignItems: "center",
-          marginBottom: "1.5rem",
-        }}
-      >
-        <strong>Flynn admin</strong>
-        <Link href="/admin">Dashboard</Link>
-        <Link href="/admin/sections">Sections</Link>
-        <Link href="/admin/works">Works</Link>
-        <Link href="/admin/works/batch">Batch</Link>
-        <Link href="/" target="_blank">
-          View site
-        </Link>
-        <form action={logoutAction}>
-          <button className="admin-btn secondary" type="submit">
-            Log out
-          </button>
-        </form>
-      </header>
-      {children}
+      <div className="admin-shell-inner">
+        <header
+          style={{
+            display: "flex",
+            gap: "1rem",
+            flexWrap: "wrap",
+            alignItems: "center",
+            marginBottom: "1.5rem",
+          }}
+        >
+          <strong>Flynn admin</strong>
+          <Link href="/admin">Dashboard</Link>
+          <Link href="/admin/sections">Sections</Link>
+          <Link href="/admin/works">Works</Link>
+          <Link href="/admin/works/batch">Batch</Link>
+          <Link href="/" target="_blank">
+            View site
+          </Link>
+          <form action={logoutAction}>
+            <button className="admin-btn secondary" type="submit">
+              Log out
+            </button>
+          </form>
+        </header>
+        {children}
+      </div>
     </div>
   );
 }
