@@ -452,23 +452,70 @@ export async function createWorksBatch(input: {
     year?: string | null;
   }>;
 }) {
-  const created = [];
-  for (const row of input.rows) {
-    if (!row.title.trim()) continue;
-    const work = await createWork({
-      sectionId: input.sectionId,
-      title: row.title.trim(),
-      series: input.series,
-      description: row.description ?? input.description,
-      longDescription: input.longDescription,
-      edition: row.edition ?? input.edition,
-      year: row.year ?? input.year,
-      price: row.price,
-      buyUrl: row.buyUrl,
-      prodigiSku: input.prodigiSku,
-      images: input.sharedImages,
-    });
+  const content = await readContent();
+  const section = content.sections.find((s) => s.id === Number(input.sectionId));
+  if (!section) throw new Error("Section not found");
+
+  const rows = input.rows.filter((row) => row.title?.trim());
+  if (!rows.length) {
+    throw new Error("Add at least one row with a title");
+  }
+
+  const created: SiteWork[] = [];
+  const existingSlugs = new Set(content.works.map((w) => w.slug));
+  let nextWorkId = nextId(content.works);
+  let nextImageId = nextId(
+    content.works.flatMap((w) => [...w.images, ...(w.altImages || [])]),
+  );
+
+  for (const row of rows) {
+    const title = row.title.trim();
+    let slug = slugify(title);
+    if (existingSlugs.has(slug)) {
+      let i = 2;
+      while (existingSlugs.has(`${slug}-${i}`)) i += 1;
+      slug = `${slug}-${i}`;
+    }
+    existingSlugs.add(slug);
+
+    const id = nextWorkId++;
+    const primary = mapImages(input.sharedImages, id, nextImageId);
+    nextImageId = primary.nextId;
+
+    const work: SiteWork = {
+      id,
+      sectionId: section.id,
+      sectionSlug: section.slug,
+      sectionTitle: section.title,
+      slug,
+      title,
+      series: input.series ?? null,
+      description: row.description ?? input.description ?? null,
+      longDescription: input.longDescription ?? null,
+      edition: row.edition ?? input.edition ?? null,
+      year: row.year ?? input.year ?? null,
+      price: row.price || null,
+      buyUrl: row.buyUrl || null,
+      prodigiSku: input.prodigiSku ?? null,
+      altLabel: null,
+      altDescription: null,
+      altLongDescription: null,
+      altEdition: null,
+      altPrice: null,
+      altBuyUrl: null,
+      altProdigiSku: null,
+      sortOrder:
+        content.works.filter((w) => w.sectionId === section.id).length +
+        created.length +
+        1,
+      published: true,
+      images: primary.images,
+      altImages: [],
+    };
+    content.works.push(work);
     created.push(work);
   }
+
+  await writeContent(content);
   return created;
 }

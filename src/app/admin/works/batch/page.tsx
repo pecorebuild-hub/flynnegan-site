@@ -12,6 +12,8 @@ export default function BatchWorksPage() {
   const [sectionId, setSectionId] = useState<number>(0);
   const [series, setSeries] = useState("");
   const [description, setDescription] = useState("");
+  const [edition, setEdition] = useState("");
+  const [year, setYear] = useState("");
   const [prodigiSku, setProdigiSku] = useState("");
   const [rows, setRows] = useState<Row[]>([
     { title: "", price: "", buyUrl: "" },
@@ -19,13 +21,14 @@ export default function BatchWorksPage() {
   ]);
   const [sharedUrls, setSharedUrls] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     void fetch("/api/admin/works")
       .then((r) => r.json())
       .then((data) => {
         setSections(data.sections || []);
-        if (data.sections?.[0]) setSectionId(data.sections[0].id);
+        if (data.sections?.[0]) setSectionId(Number(data.sections[0].id));
       });
   }, []);
 
@@ -38,49 +41,76 @@ export default function BatchWorksPage() {
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError("");
-    const response = await fetch("/api/admin/works", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        batch: {
-          sectionId,
-          series: series || null,
-          description: description || null,
-          prodigiSku: prodigiSku || null,
-          sharedImages: sharedUrls
-            .split("\n")
-            .map((url) => url.trim())
-            .filter(Boolean)
-            .map((url) => ({ url })),
-          rows: rows.filter((row) => row.title.trim()),
-        },
-      }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      setError(data.error || "Batch failed");
+    const filledRows = rows.filter((row) => row.title.trim());
+    if (!sectionId) {
+      setError("Choose a section");
       return;
     }
-    router.push("/admin/works");
-    router.refresh();
+    if (!filledRows.length) {
+      setError("Add at least one row with a title");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch("/api/admin/works", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          batch: {
+            sectionId: Number(sectionId),
+            series: series || null,
+            description: description || null,
+            edition: edition || null,
+            year: year || null,
+            prodigiSku: prodigiSku || null,
+            sharedImages: sharedUrls
+              .split("\n")
+              .map((url) => url.trim())
+              .filter(Boolean)
+              .map((url) => ({ url })),
+            rows: filledRows,
+          },
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error || "Batch failed");
+        return;
+      }
+      const count = Array.isArray(data.works) ? data.works.length : 0;
+      if (!count) {
+        setError("Nothing was created — check titles and try again");
+        return;
+      }
+      router.push("/admin/works");
+      router.refresh();
+    } catch {
+      setError("Network error — batch failed");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
     <>
       <h1>Batch add works</h1>
       <p style={{ color: "#555", maxWidth: 640 }}>
-        Shared fields (series, description, optional shared image URLs, Prodigi
-        SKU) apply to every row. Per row: title, price, buy link — for series
-        where only those change.
+        Shared fields (series, description, edition, year, optional shared image
+        URLs, Prodigi SKU) apply to every row. Per row: title, price, buy link.
       </p>
 
       <form className="admin-form admin-card" onSubmit={onSubmit}>
         <label>
           Section
           <select
-            value={sectionId}
+            value={sectionId || ""}
             onChange={(e) => setSectionId(Number(e.target.value))}
+            required
           >
+            <option value="" disabled>
+              Select section
+            </option>
             {sections.map((section) => (
               <option key={section.id} value={section.id}>
                 {section.title}
@@ -98,6 +128,22 @@ export default function BatchWorksPage() {
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+          />
+        </label>
+        <label>
+          Edition / тираж (shared)
+          <input
+            value={edition}
+            onChange={(e) => setEdition(e.target.value)}
+            placeholder="Ed. 10/10"
+          />
+        </label>
+        <label>
+          Year (shared)
+          <input
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            placeholder="2026"
           />
         </label>
         <label>
@@ -168,7 +214,9 @@ export default function BatchWorksPage() {
         </div>
 
         {error ? <p style={{ color: "#b00020" }}>{error}</p> : null}
-        <button type="submit">Create works</button>
+        <button type="submit" disabled={saving}>
+          {saving ? "Creating…" : "Create works"}
+        </button>
       </form>
     </>
   );
