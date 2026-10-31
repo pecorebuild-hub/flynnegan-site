@@ -231,8 +231,8 @@ button:active {
 }
 
 .work-card-cover img {
-  width: 66.666%;
-  max-width: 66.666%;
+  width: 100%;
+  max-width: 36rem;
   height: auto;
   display: block;
   background: #111;
