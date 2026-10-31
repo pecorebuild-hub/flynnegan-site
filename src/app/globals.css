@@ -402,6 +402,8 @@ button:active {
 /* Lead image alone on the first row; the rest follow in the 2-col grid */
 .gallery-grid:not(.single) > .gallery-item:first-child {
   grid-column: 1 / -1;
+  width: min(80%, 1600px);
+  max-width: 1600px;
 }
 
 .gallery-item {
