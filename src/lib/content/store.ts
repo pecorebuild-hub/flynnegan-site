@@ -145,9 +145,17 @@ function normalizeContent(content: SiteContent): SiteContent {
 }
 
 const BLOB_CONTENT_PATH = "content/site.json";
+const BLOB_CONTENT_BACKUP_PREFIX = "content/backups/site-";
+/** Keep a few timestamped backups so a bad write/seed wipe is recoverable. */
+const BLOB_BACKUP_LIMIT = 10;
 
-async function readBlobContent(): Promise<SiteContent | null> {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
+type BlobReadResult =
+  | { status: "ok"; content: SiteContent }
+  | { status: "missing" }
+  | { status: "error"; message: string };
+
+async function readBlobContent(): Promise<BlobReadResult> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return { status: "missing" };
   try {
     const { list } = await import("@vercel/blob");
     const result = await list({
@@ -155,24 +163,83 @@ async function readBlobContent(): Promise<SiteContent | null> {
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
     const blob = result.blobs.find((item) => item.pathname === BLOB_CONTENT_PATH);
-    if (!blob) return null;
+    if (!blob) return { status: "missing" };
     const response = await fetch(blob.url, { cache: "no-store" });
-    if (!response.ok) return null;
-    return (await response.json()) as SiteContent;
+    if (response.status === 404) return { status: "missing" };
+    if (!response.ok) {
+      return {
+        status: "error",
+        message: `Blob fetch failed (${response.status})`,
+      };
+    }
+    return {
+      status: "ok",
+      content: (await response.json()) as SiteContent,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "Blob read failed",
+    };
+  }
+}
+
+async function pruneBlobBackups(token: string) {
+  try {
+    const { list, del } = await import("@vercel/blob");
+    const result = await list({
+      prefix: BLOB_CONTENT_BACKUP_PREFIX,
+      token,
+    });
+    const sorted = [...result.blobs].sort(
+      (a, b) =>
+        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
+    );
+    const stale = sorted.slice(BLOB_BACKUP_LIMIT);
+    if (stale.length) {
+      await del(
+        stale.map((item) => item.url),
+        { token },
+      );
+    }
   } catch {
-    return null;
+    // Backup pruning is best-effort.
   }
 }
 
 async function writeBlobContent(content: SiteContent): Promise<boolean> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return false;
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
   const { put } = await import("@vercel/blob");
-  await put(BLOB_CONTENT_PATH, JSON.stringify(content, null, 2), {
+  const body = JSON.stringify(content, null, 2);
+
+  // Snapshot current file before overwrite (ignore if missing).
+  try {
+    const current = await readBlobContent();
+    if (current.status === "ok") {
+      await put(
+        `${BLOB_CONTENT_BACKUP_PREFIX}${Date.now()}.json`,
+        JSON.stringify(current.content, null, 2),
+        {
+          access: "public",
+          addRandomSuffix: false,
+          allowOverwrite: true,
+          contentType: "application/json",
+          token,
+        },
+      );
+      await pruneBlobBackups(token);
+    }
+  } catch {
+    // Continue with the primary write even if backup fails.
+  }
+
+  await put(BLOB_CONTENT_PATH, body, {
     access: "public",
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+    token,
   });
   return true;
 }
@@ -182,23 +249,37 @@ async function loadSeedContent(): Promise<SiteContent> {
   return seedToContent(seed);
 }
 
+/**
+ * Read live content. Never auto-writes seed into Blob — that wiped user works
+ * when a deploy/build hit a transient Blob miss.
+ */
 export async function ensureContent(): Promise<SiteContent> {
   const fromBlob = await readBlobContent();
-  if (fromBlob) return normalizeContent(fromBlob);
+  if (fromBlob.status === "ok") return normalizeContent(fromBlob.content);
+  if (fromBlob.status === "error") {
+    // Prefer local file over silently falling back to seed on prod.
+    try {
+      await fs.access(CONTENT_PATH);
+      return normalizeContent(await readJson<SiteContent>(CONTENT_PATH));
+    } catch {
+      throw new Error(
+        `Cannot read site content from Blob (${fromBlob.message}). Refusing to overwrite with seed.`,
+      );
+    }
+  }
 
   try {
     await fs.access(CONTENT_PATH);
     return normalizeContent(await readJson<SiteContent>(CONTENT_PATH));
   } catch {
+    // First boot / empty store: serve seed in-memory (and locally if writable).
+    // Do NOT push seed to Blob — that only happens via explicit resetFromSeed().
     const content = await loadSeedContent();
     try {
       await fs.mkdir(DATA_DIR, { recursive: true });
       await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
     } catch {
-      // read-only FS (e.g. Vercel) — return seed in-memory
-    }
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      await writeBlobContent(content);
+      // read-only FS (e.g. Vercel)
     }
     return content;
   }

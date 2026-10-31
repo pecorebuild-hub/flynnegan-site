@@ -11,6 +11,9 @@ import {
   websiteJsonLd,
 } from "@/lib/seo";
 
+/** Content lives in Vercel Blob — never bake seed into a static build. */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {

@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { readContent, resetFromSeed } from "@/lib/content/store";
+
+export const dynamic = "force-dynamic";
 
 async function resetSeedAction() {
   "use server";
@@ -35,9 +38,12 @@ export default async function AdminDashboardPage() {
             Font previews
           </Link>
           <form action={resetSeedAction}>
-            <button className="admin-btn secondary" type="submit">
+            <ConfirmSubmit
+              className="admin-btn secondary"
+              confirmMessage="This replaces ALL works/sections with seed.json. Continue?"
+            >
               Reset from seed.json
-            </button>
+            </ConfirmSubmit>
           </form>
         </p>
       </div>
