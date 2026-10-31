@@ -1,0 +1,313 @@
+import { promises as fs } from "fs";
+import path from "path";
+import type { SiteContent, SiteSection, SiteWork, SiteWorkImage } from "../types";
+import { slugify } from "../slug";
+
+const DATA_DIR = path.join(process.cwd(), "data");
+const CONTENT_PATH = path.join(DATA_DIR, "content.json");
+const SEED_PATH = path.join(DATA_DIR, "seed.json");
+
+type SeedFile = {
+  sections: Array<{
+    slug: string;
+    title: string;
+    sortOrder: number;
+    showInNav: boolean;
+  }>;
+  works: Array<{
+    sectionSlug: string;
+    slug: string;
+    title: string;
+    series: string | null;
+    description: string | null;
+    price: string | null;
+    buyUrl: string | null;
+    prodigiSku?: string | null;
+    sortOrder: number;
+    images: Array<{
+      url: string;
+      caption: string;
+      sortOrder: number;
+    }>;
+  }>;
+  site: SiteContent["site"];
+};
+
+async function readJson<T>(filePath: string): Promise<T> {
+  const raw = await fs.readFile(filePath, "utf8");
+  return JSON.parse(raw) as T;
+}
+
+function seedToContent(seed: SeedFile): SiteContent {
+  const sections: SiteSection[] = seed.sections.map((s, i) => ({
+    id: i + 1,
+    slug: s.slug,
+    title: s.title,
+    sortOrder: s.sortOrder,
+    showInNav: s.showInNav,
+  }));
+
+  const sectionBySlug = new Map(sections.map((s) => [s.slug, s]));
+  let workId = 1;
+  let imageId = 1;
+
+  const works: SiteWork[] = seed.works.map((w) => {
+    const section = sectionBySlug.get(w.sectionSlug);
+    if (!section) {
+      throw new Error(`Unknown section slug: ${w.sectionSlug}`);
+    }
+    const id = workId++;
+    const images: SiteWorkImage[] = (w.images || []).map((img, idx) => ({
+      id: imageId++,
+      workId: id,
+      url: img.url,
+      caption: img.caption || null,
+      sortOrder: img.sortOrder ?? idx,
+    }));
+    return {
+      id,
+      sectionId: section.id,
+      sectionSlug: section.slug,
+      sectionTitle: section.title,
+      slug: w.slug,
+      title: w.title,
+      series: w.series,
+      description: w.description,
+      price: w.price,
+      buyUrl: w.buyUrl,
+      prodigiSku: w.prodigiSku ?? null,
+      sortOrder: w.sortOrder,
+      published: true,
+      images,
+    };
+  });
+
+  return { sections, works, site: seed.site };
+}
+
+export async function ensureContent(): Promise<SiteContent> {
+  try {
+    await fs.access(CONTENT_PATH);
+    return readJson<SiteContent>(CONTENT_PATH);
+  } catch {
+    const seed = await readJson<SeedFile>(SEED_PATH);
+    const content = seedToContent(seed);
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
+    return content;
+  }
+}
+
+export async function readContent(): Promise<SiteContent> {
+  return ensureContent();
+}
+
+export async function writeContent(content: SiteContent): Promise<void> {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
+}
+
+export async function getNavSections() {
+  const content = await readContent();
+  return content.sections
+    .filter((s) => s.showInNav)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+export async function getSectionBySlug(slug: string) {
+  const content = await readContent();
+  return content.sections.find((s) => s.slug === slug) ?? null;
+}
+
+export async function getWorksBySectionSlug(slug: string) {
+  const content = await readContent();
+  return content.works
+    .filter((w) => w.sectionSlug === slug && w.published)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+export async function getWorkBySlug(slug: string) {
+  const content = await readContent();
+  return content.works.find((w) => w.slug === slug && w.published) ?? null;
+}
+
+export async function getAllWorks() {
+  const content = await readContent();
+  return content.works.sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+export async function getSiteMeta() {
+  const content = await readContent();
+  return content.site;
+}
+
+function nextId(items: { id: number }[]) {
+  return items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+}
+
+export async function createSection(input: {
+  title: string;
+  slug?: string;
+  showInNav?: boolean;
+}) {
+  const content = await readContent();
+  const slug = input.slug || slugify(input.title);
+  if (content.sections.some((s) => s.slug === slug)) {
+    throw new Error("Section slug already exists");
+  }
+  const section: SiteSection = {
+    id: nextId(content.sections),
+    slug,
+    title: input.title,
+    sortOrder: content.sections.length + 1,
+    showInNav: input.showInNav ?? true,
+  };
+  content.sections.push(section);
+  await writeContent(content);
+  return section;
+}
+
+export async function updateSection(
+  id: number,
+  patch: Partial<Pick<SiteSection, "title" | "slug" | "sortOrder" | "showInNav">>,
+) {
+  const content = await readContent();
+  const section = content.sections.find((s) => s.id === id);
+  if (!section) throw new Error("Section not found");
+  Object.assign(section, patch);
+  for (const work of content.works) {
+    if (work.sectionId === id) {
+      work.sectionSlug = section.slug;
+      work.sectionTitle = section.title;
+    }
+  }
+  await writeContent(content);
+  return section;
+}
+
+export async function deleteSection(id: number) {
+  const content = await readContent();
+  content.sections = content.sections.filter((s) => s.id !== id);
+  content.works = content.works.filter((w) => w.sectionId !== id);
+  await writeContent(content);
+}
+
+export type WorkInput = {
+  sectionId: number;
+  title: string;
+  slug?: string;
+  series?: string | null;
+  description?: string | null;
+  price?: string | null;
+  buyUrl?: string | null;
+  prodigiSku?: string | null;
+  published?: boolean;
+  images?: Array<{ url: string; caption?: string | null; sortOrder?: number }>;
+};
+
+export async function createWork(input: WorkInput) {
+  const content = await readContent();
+  const section = content.sections.find((s) => s.id === input.sectionId);
+  if (!section) throw new Error("Section not found");
+
+  let slug = input.slug || slugify(input.title);
+  const existing = new Set(content.works.map((w) => w.slug));
+  if (existing.has(slug)) {
+    let i = 2;
+    while (existing.has(`${slug}-${i}`)) i += 1;
+    slug = `${slug}-${i}`;
+  }
+
+  const id = nextId(content.works);
+  const imageBase = nextId(content.works.flatMap((w) => w.images));
+  const images: SiteWorkImage[] = (input.images || []).map((img, idx) => ({
+    id: imageBase + idx,
+    workId: id,
+    url: img.url,
+    caption: img.caption ?? null,
+    sortOrder: img.sortOrder ?? idx,
+  }));
+
+  const work: SiteWork = {
+    id,
+    sectionId: section.id,
+    sectionSlug: section.slug,
+    sectionTitle: section.title,
+    slug,
+    title: input.title,
+    series: input.series ?? null,
+    description: input.description ?? null,
+    price: input.price ?? null,
+    buyUrl: input.buyUrl ?? null,
+    prodigiSku: input.prodigiSku ?? null,
+    sortOrder:
+      content.works.filter((w) => w.sectionId === section.id).length + 1,
+    published: input.published ?? true,
+    images,
+  };
+  content.works.push(work);
+  await writeContent(content);
+  return work;
+}
+
+export async function updateWork(
+  id: number,
+  patch: Partial<Omit<SiteWork, "id" | "images" | "sectionSlug" | "sectionTitle">> & {
+    images?: SiteWorkImage[];
+  },
+) {
+  const content = await readContent();
+  const work = content.works.find((w) => w.id === id);
+  if (!work) throw new Error("Work not found");
+
+  if (patch.sectionId && patch.sectionId !== work.sectionId) {
+    const section = content.sections.find((s) => s.id === patch.sectionId);
+    if (!section) throw new Error("Section not found");
+    work.sectionId = section.id;
+    work.sectionSlug = section.slug;
+    work.sectionTitle = section.title;
+  }
+
+  const { images, sectionId: _s, ...rest } = patch;
+  Object.assign(work, rest);
+  if (images) work.images = images;
+  await writeContent(content);
+  return work;
+}
+
+export async function deleteWork(id: number) {
+  const content = await readContent();
+  content.works = content.works.filter((w) => w.id !== id);
+  await writeContent(content);
+}
+
+export async function createWorksBatch(input: {
+  sectionId: number;
+  series?: string | null;
+  description?: string | null;
+  prodigiSku?: string | null;
+  sharedImages?: Array<{ url: string; caption?: string | null }>;
+  rows: Array<{
+    title: string;
+    price?: string | null;
+    buyUrl?: string | null;
+    description?: string | null;
+  }>;
+}) {
+  const created = [];
+  for (const row of input.rows) {
+    if (!row.title.trim()) continue;
+    const work = await createWork({
+      sectionId: input.sectionId,
+      title: row.title.trim(),
+      series: input.series,
+      description: row.description ?? input.description,
+      price: row.price,
+      buyUrl: row.buyUrl,
+      prodigiSku: input.prodigiSku,
+      images: input.sharedImages,
+    });
+    created.push(work);
+  }
+  return created;
+}

@@ -1,26 +1,436 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/BricolageGrotesque-Variable.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IM Fell English";
+  src: url("/fonts/IMFellEnglish-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IM Fell English";
+  src: url("/fonts/IMFellEnglish-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #191919;
+  --fg: rgba(255, 255, 255, 0.85);
+  --muted: rgba(255, 255, 255, 0.4);
+  --soft: rgba(255, 255, 255, 0.75);
+  --faint: rgba(255, 255, 255, 0.25);
+  --font-display: "Geist", system-ui, sans-serif;
+  --font-body: "Geist", system-ui, sans-serif;
+  --nav-width: 15rem;
+  --page-pad: clamp(1rem, 2.5vw, 2rem);
+}
+
+html[data-font="bricolage"] {
+  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-body: "Bricolage Grotesque", system-ui, sans-serif;
+}
+
+html[data-font="geist"] {
+  --font-display: "Geist", system-ui, sans-serif;
+  --font-body: "Geist", system-ui, sans-serif;
+}
+
+html[data-font="geist-mono"] {
+  --font-display: "Geist", system-ui, sans-serif;
+  --font-body: "Geist Mono", ui-monospace, monospace;
+}
+
+html[data-font="fell"] {
+  --font-display: "IM Fell English", Georgia, serif;
+  --font-body: "Geist", system-ui, sans-serif;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-soft: var(--soft);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:active,
+button:active {
+  opacity: 0.7;
+}
+
+.site-shell {
+  display: grid;
+  grid-template-columns: var(--nav-width) minmax(0, 1fr);
+  min-height: 100vh;
+  gap: 0;
+}
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  padding: var(--page-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow: auto;
+}
+
+.site-main {
+  padding: var(--page-pad);
+  padding-bottom: 5rem;
+  min-width: 0;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.brand-muted {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+}
+
+.nav-block {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1.55;
+}
+
+.nav-block a {
+  display: inline;
+}
+
+.nav-block a.active {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.nav-label {
+  color: var(--muted);
+}
+
+.work-block {
+  margin-bottom: 4.5rem;
+  scroll-margin-top: 1.5rem;
+}
+
+.work-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+  margin-bottom: 1rem;
+}
+
+.work-title,
+.work-index,
+.work-meta {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  line-height: 1.35;
+  font-weight: 400;
+  margin: 0;
+}
+
+.work-index a {
+  color: var(--soft);
+}
+
+.work-meta {
+  margin-bottom: 1.25rem;
+  white-space: pre-wrap;
+}
+
+.work-series-label {
+  display: block;
+}
+
+.work-series-name {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.buy-button {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+}
+
+.buy-button:hover {
+  opacity: 0.85;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.gallery-grid.single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.gallery-item {
+  margin: 0;
+  cursor: zoom-in;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  width: 100%;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #111;
+}
+
+.gallery-caption {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.site-footer {
+  color: var(--muted);
+  font-family: var(--font-display);
+  margin-top: 3rem;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.lightbox img {
+  max-width: min(96vw, 1400px);
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.lightbox-caption {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--soft);
+  font-size: 0.95rem;
+}
+
+.lightbox-nav,
+.lightbox-close {
+  position: absolute;
+  appearance: none;
+  border: 0;
+  background: rgba(87, 87, 87, 0.35);
+  color: white;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+}
+
+.lightbox-close {
+  top: 1.25rem;
+  right: 1.25rem;
+}
+
+.lightbox-prev {
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-next {
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.font-preview-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(25, 25, 25, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.75rem var(--page-pad);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.font-preview-bar a {
+  color: var(--soft);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.font-preview-bar a.active {
+  color: white;
+}
+
+.admin-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+  color: #111;
+  background: #f4f4f4;
+  min-height: 100vh;
+  font-family: system-ui, sans-serif;
+}
+
+.admin-shell a {
+  color: #111;
+}
+
+.admin-card {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-form label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font: inherit;
+}
+
+.admin-form button,
+.admin-btn {
+  appearance: none;
+  border: 1px solid #111;
+  background: #111;
+  color: white;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  font: inherit;
+  width: fit-content;
+}
+
+.admin-btn.secondary {
+  background: white;
+  color: #111;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+@media (max-width: 860px) {
+  .site-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .site-nav {
+    position: relative;
+    height: auto;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
 }

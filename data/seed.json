@@ -1,0 +1,121 @@
+{
+  "sections": [
+    {
+      "slug": "prints",
+      "title": "Prints",
+      "sortOrder": 1,
+      "showInNav": true
+    },
+    {
+      "slug": "metal-plaques",
+      "title": "Metal Plaques",
+      "sortOrder": 2,
+      "showInNav": true
+    }
+  ],
+  "works": [
+    {
+      "sectionSlug": "prints",
+      "slug": "in-the-night-1",
+      "title": "In the Night #1",
+      "series": "Master And His Companion",
+      "description": "42 x 60 cm. Digital media.\nGiclée fine art print (Hahnemühle).\n\nEd. 10/10",
+      "price": "300",
+      "buyUrl": "https://throne.com/flynnegan/item/4f3e9621-9007-47b5-95e4-d0f9c33945c5",
+      "sortOrder": 1,
+      "images": [
+        {
+          "url": "https://freight.cargo.site/t/original/i/T3206156601320121977228279492773/",
+          "caption": "",
+          "sortOrder": 0
+        },
+        {
+          "url": "https://freight.cargo.site/t/original/i/V3206159208103314009419856556197/",
+          "caption": "",
+          "sortOrder": 1
+        }
+      ]
+    },
+    {
+      "sectionSlug": "prints",
+      "slug": "camellias-and-lillies",
+      "title": "Camellias & Lillies",
+      "series": "Master And His Companion",
+      "description": "42 x 60 cm. Digital media.\nGiclée fine art print (Hahnemühle).\n\nEd. 10/10",
+      "price": "350",
+      "buyUrl": "https://throne.com/flynnegan/item/c5a5e312-e0ef-4e7a-bc2c-d1602e21bc00",
+      "sortOrder": 2,
+      "images": [
+        {
+          "url": "https://freight.cargo.site/w/1000/i/N3206145231780092610788398280869/FL3_1_sm.png",
+          "caption": "",
+          "sortOrder": 0
+        },
+        {
+          "url": "https://freight.cargo.site/w/1000/i/G3206151955765881430509638725797/Frame-10.png",
+          "caption": "",
+          "sortOrder": 1
+        },
+        {
+          "url": "https://freight.cargo.site/w/1000/i/J3206152511916768508778910396581/Hahnemhle-German-etching---a3--hge--310gsm--portrait--AngledRolled.jpg",
+          "caption": "Hahnemühle German Etching",
+          "sortOrder": 2
+        }
+      ]
+    },
+    {
+      "sectionSlug": "metal-plaques",
+      "slug": "plaque-1",
+      "title": "Plaque #1",
+      "series": "Master And His Companion",
+      "description": "Metal plaque (Dibond matte).",
+      "price": "200",
+      "buyUrl": "https://throne.com/flynnegan/item/6606d7b6-73e6-4838-bd37-a68fb0bfbab8",
+      "sortOrder": 1,
+      "images": [
+        {
+          "url": "https://freight.cargo.site/w/1000/i/Q3206189434975046678038553637029/postcard5.png",
+          "caption": "",
+          "sortOrder": 0
+        },
+        {
+          "url": "https://freight.cargo.site/w/1000/i/L3206162556205810131777184411813/Dibond---matte--dibond--landscape--HeadOn.jpg",
+          "caption": "Dibond — head-on",
+          "sortOrder": 1
+        },
+        {
+          "url": "https://freight.cargo.site/w/1000/i/F3206162556187363387703474860197/Dibond---matte--dibond--landscape--CloseUp.jpg",
+          "caption": "Dibond — close-up",
+          "sortOrder": 2
+        }
+      ]
+    },
+    {
+      "sectionSlug": "metal-plaques",
+      "slug": "plaque-2",
+      "title": "Plaque #2",
+      "series": "Master And His Companion",
+      "description": "Metal plaque (Dibond matte).",
+      "price": "200",
+      "buyUrl": "https://throne.com/flynnegan/item/6606d7b6-73e6-4838-bd37-a68fb0bfbab8",
+      "sortOrder": 2,
+      "images": [
+        {
+          "url": "https://freight.cargo.site/w/1000/i/Q3206188778252510909904806555813/postcard7.png",
+          "caption": "",
+          "sortOrder": 0
+        },
+        {
+          "url": "https://freight.cargo.site/w/750/i/P3206162556150469899556055756965/Dibond---matte--dibond--landscape--Angled.jpg",
+          "caption": "Dibond — angled",
+          "sortOrder": 1
+        }
+      ]
+    }
+  ],
+  "site": {
+    "title": "Flynn Egan. Male Erotic Art",
+    "tagline": "Gay BDSM Erotic Art | Prints & Private Commissions",
+    "description": "Erotic Male Fine Art, Gay Queer BDSM Gothic Dark Prints & Custom Artwork"
+  }
+}
