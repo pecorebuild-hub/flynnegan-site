@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { WorkImage } from "./WorkImage";
 import type { SiteWorkImage } from "@/lib/types";
 
 type Props = {
@@ -56,8 +57,17 @@ export function Gallery({ images }: Props) {
             className="gallery-item"
             onClick={() => setOpenIndex(index)}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image.url} alt={image.caption || ""} loading="lazy" />
+            <WorkImage
+              src={image.url}
+              alt={image.caption || ""}
+              sizes={
+                index === 0
+                  ? "(max-width: 860px) 92vw, min(80vw, 1600px)"
+                  : "(max-width: 860px) 92vw, 40vw"
+              }
+              priority={index === 0}
+              quality={index === 0 ? 78 : 70}
+            />
             {image.caption ? (
               <div className="gallery-caption">{image.caption}</div>
             ) : null}
@@ -95,8 +105,21 @@ export function Gallery({ images }: Props) {
               </button>
             </>
           ) : null}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={active.url} alt={active.caption || ""} />
+          <WorkImage
+            src={active.url}
+            alt={active.caption || ""}
+            sizes="100vw"
+            quality={85}
+            width={1920}
+            height={2400}
+            priority
+            style={{
+              width: "auto",
+              height: "auto",
+              maxWidth: "min(96vw, 1400px)",
+              maxHeight: "82vh",
+            }}
+          />
           {active.caption ? (
             <div className="lightbox-caption">{active.caption}</div>
           ) : null}

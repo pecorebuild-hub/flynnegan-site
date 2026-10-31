@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BackLink } from "./BackLink";
 import { TextBlocks } from "./TextBlocks";
+import { WorkImage } from "./WorkImage";
 import type { SiteWork } from "@/lib/types";
 import { workHasAltFormat } from "@/lib/types";
 
@@ -70,8 +71,12 @@ export function WorkCard({ work }: Props) {
 
       {cover ? (
         <Link href={href} className="work-card-cover">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={cover.url} alt={cover.caption || work.title} loading="lazy" />
+          <WorkImage
+            src={cover.url}
+            alt={cover.caption || work.title}
+            sizes="(max-width: 860px) 92vw, 45vw"
+            quality={72}
+          />
         </Link>
       ) : null}
     </article>

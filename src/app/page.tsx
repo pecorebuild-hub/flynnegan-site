@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteShell } from "@/components/SiteShell";
+import { WorkImage } from "@/components/WorkImage";
 import {
   getLatestWorks,
   getNavSections,
@@ -31,7 +32,7 @@ export default async function HomePage() {
         <p className="lede">No works yet.</p>
       ) : (
         <div className="latest-masonry">
-          {latest.map((work) => {
+          {latest.map((work, index) => {
             const cover = [...work.images].sort(
               (a, b) => a.sortOrder - b.sortOrder,
             )[0];
@@ -40,11 +41,12 @@ export default async function HomePage() {
               <article key={work.id} className="latest-item">
                 <Link href={href} className="latest-media">
                   {cover ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <WorkImage
                       src={cover.url}
                       alt={work.title}
-                      loading="lazy"
+                      sizes="(max-width: 860px) 92vw, 36vw"
+                      priority={index < 4}
+                      quality={70}
                     />
                   ) : (
                     <div className="latest-placeholder" />
