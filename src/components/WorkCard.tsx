@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackLink } from "./BackLink";
 import type { SiteWork } from "@/lib/types";
 
 type Props = {
@@ -16,7 +17,7 @@ export function WorkCard({ work }: Props) {
           <Link href={href}>{work.title}</Link>
         </h2>
         <h2 className="work-index">
-          <Link href={`/${work.sectionSlug}#`}>Index</Link>
+          <BackLink href="/" />
         </h2>
       </div>
 

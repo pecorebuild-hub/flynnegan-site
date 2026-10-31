@@ -200,9 +200,15 @@ button:active {
   font-weight: 420;
 }
 
-.work-index a {
+.work-index a,
+.work-index .back-link {
   color: var(--soft);
   font-weight: 420;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 .work-card {
@@ -533,6 +539,30 @@ button:active {
   padding: 0.5rem;
   text-align: left;
   vertical-align: top;
+}
+
+.admin-image-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  align-items: start;
+}
+
+.admin-thumb {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  display: block;
+  background: #e8e8e8;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.admin-image-fields {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
 }
 
 .page-prose {

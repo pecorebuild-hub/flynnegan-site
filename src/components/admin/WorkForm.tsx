@@ -239,29 +239,35 @@ export function WorkForm({ sections, initial }: Props) {
         {form.images.map((image, index) => (
           <div
             key={`${image.url}-${index}`}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "96px 1fr auto",
-              gap: "0.75rem",
-              marginTop: "0.75rem",
-              alignItems: "center",
-            }}
+            className="admin-image-row"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
+              className="admin-thumb"
               src={image.url}
               alt=""
-              style={{ width: 96, height: 96, objectFit: "cover" }}
+              referrerPolicy="no-referrer"
             />
-            <input
-              placeholder="Caption"
-              value={image.caption}
-              onChange={(e) => {
-                const images = [...form.images];
-                images[index] = { ...image, caption: e.target.value };
-                update("images", images);
-              }}
-            />
+            <div className="admin-image-fields">
+              <input
+                placeholder="Image URL"
+                value={image.url}
+                onChange={(e) => {
+                  const images = [...form.images];
+                  images[index] = { ...image, url: e.target.value };
+                  update("images", images);
+                }}
+              />
+              <input
+                placeholder="Caption"
+                value={image.caption}
+                onChange={(e) => {
+                  const images = [...form.images];
+                  images[index] = { ...image, caption: e.target.value };
+                  update("images", images);
+                }}
+              />
+            </div>
             <button
               type="button"
               className="admin-btn secondary"

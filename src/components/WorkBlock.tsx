@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { BackLink } from "./BackLink";
 import { Gallery } from "./Gallery";
 import type { SiteWork } from "@/lib/types";
 
@@ -19,7 +19,7 @@ export function WorkBlock({ work, sectionSlug }: Props) {
       <div className="work-header">
         <h1 className="work-title work-title-page">{work.title}</h1>
         <h2 className="work-index">
-          <Link href={`/${sectionSlug}`}>Index</Link>
+          <BackLink href={`/${sectionSlug}`} />
         </h2>
       </div>
 
