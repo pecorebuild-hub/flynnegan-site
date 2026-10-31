@@ -319,7 +319,7 @@ export async function getWorksBySectionSlug(slug: string) {
   const content = await readContent();
   return content.works
     .filter((w) => w.sectionSlug === slug && w.published)
-    .sort((a, b) => a.sortOrder - b.sortOrder);
+    .sort((a, b) => b.id - a.id);
 }
 
 export async function getWorkBySlug(slug: string) {
