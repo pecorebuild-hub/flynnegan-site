@@ -23,6 +23,8 @@ export default async function EditWorkPage({ params }: Props) {
           title: work.title,
           series: work.series || "",
           description: work.description || "",
+          longDescription: work.longDescription || "",
+          edition: work.edition || "",
           price: work.price || "",
           buyUrl: work.buyUrl || "",
           prodigiSku: work.prodigiSku || "",

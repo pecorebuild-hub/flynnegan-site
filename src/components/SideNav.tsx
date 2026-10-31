@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { SiteSection } from "@/lib/types";
+import { splitBrandTitle } from "@/lib/types";
 
 type Props = {
   sections: SiteSection[];
@@ -15,12 +16,14 @@ export function SideNav({
   tagline,
 }: Props) {
   const selectedCount = sections.length;
+  const { line1, line2 } = splitBrandTitle(brandTitle);
 
   return (
     <aside className="site-nav">
       <div>
         <Link href="/" className="brand">
-          {brandTitle}
+          <span className="brand-line">{line1}</span>
+          {line2 ? <span className="brand-line">{line2}</span> : null}
         </Link>
         <p className="brand-muted">{tagline}</p>
       </div>

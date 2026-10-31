@@ -17,9 +17,9 @@ export function WorkBlock({ work, sectionSlug }: Props) {
   return (
     <article id={work.slug} className="work-block">
       <div className="work-header">
-        <h2 className="work-title">{work.title}</h2>
+        <h1 className="work-title work-title-page">{work.title}</h1>
         <h2 className="work-index">
-          <Link href={`/${sectionSlug}#`}>Index</Link>
+          <Link href={`/${sectionSlug}`}>Index</Link>
         </h2>
       </div>
 
@@ -32,6 +32,8 @@ export function WorkBlock({ work, sectionSlug }: Props) {
           </>
         ) : null}
         {work.description}
+        {work.edition ? `\n\n${work.edition}` : null}
+        {work.longDescription ? `\n\n${work.longDescription}` : null}
         {work.buyUrl && priceLabel ? (
           <>
             {"\n\n"}

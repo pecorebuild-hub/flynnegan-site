@@ -16,19 +16,15 @@ export function CommissionsContent() {
         <p>
           One-two colors graphic study or lineart based on your photo references
         </p>
-        <ol>
-          <li>
-            <strong>Format:</strong> High-resolution digital file (300 DPI,
-            ready for print).
-          </li>
-          <li>
-            <strong>Process:</strong> Created strictly in my signature style. No
-            revisions.
-          </li>
-          <li>
-            <strong>Turnaround:</strong> 5–7 business days.
-          </li>
-        </ol>
+        <p>
+          [1] <strong>Format:</strong> High-resolution digital file (300 DPI,
+          ready for print).
+          <br />
+          [2] <strong>Process:</strong> Created strictly in my signature style.
+          No revisions.
+          <br />
+          [3] <strong>Turnaround:</strong> 5–7 business days.
+        </p>
         <a
           className="buy-button"
           href="https://throne.com/flynnegan/item/b98f82fa-d30d-411c-b435-8589a7d3ebf4"
@@ -49,19 +45,15 @@ export function CommissionsContent() {
           Full-color, fully rendered digital painting in my aesthetic based on
           your photo references
         </p>
-        <ol>
-          <li>
-            <strong>Format:</strong> High-resolution digital file (300 DPI,
-            suitable for large-format printing).
-          </li>
-          <li>
-            <strong>Process:</strong> Created strictly in my signature style. No
-            revisions.
-          </li>
-          <li>
-            <strong>Turnaround:</strong> 10–14 business days.
-          </li>
-        </ol>
+        <p>
+          [1] <strong>Format:</strong> High-resolution digital file (300 DPI,
+          suitable for large-format printing).
+          <br />
+          [2] <strong>Process:</strong> Created strictly in my signature style.
+          No revisions.
+          <br />
+          [3] <strong>Turnaround:</strong> 10–14 business days.
+        </p>
         <a
           className="buy-button"
           href="https://throne.com/flynnegan/item/76555381-75ba-4884-ae4a-c7e20e77fab8"
@@ -82,19 +74,15 @@ export function CommissionsContent() {
           Complete custom digital artwork paired with a gallery-quality physical
           print delivered directly to your door.
         </p>
-        <ol>
-          <li>
-            <strong>Format:</strong> High-resolution digital file + 1×
-            Hahnemühle Fine Art Print.
-          </li>
-          <li>
-            Created strictly in my signature style. No revisions. Global
-            trackable shipping included.
-          </li>
-          <li>
-            <strong>Turnaround:</strong> 14–21 business days.
-          </li>
-        </ol>
+        <p>
+          [1] <strong>Format:</strong> High-resolution digital file + 1×
+          Hahnemühle Fine Art Print.
+          <br />
+          [2] Created strictly in my signature style. No revisions. Global
+          trackable shipping included.
+          <br />
+          [3] <strong>Turnaround:</strong> 14–21 business days.
+        </p>
         <a
           className="buy-button"
           href="https://throne.com/flynnegan/item/f55912c8-5913-4510-a7ca-3c9fc1c968a2"

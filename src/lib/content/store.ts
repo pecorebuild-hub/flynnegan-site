@@ -20,6 +20,8 @@ type SeedFile = {
     title: string;
     series: string | null;
     description: string | null;
+    longDescription?: string | null;
+    edition?: string | null;
     price: string | null;
     buyUrl: string | null;
     prodigiSku?: string | null;
@@ -73,6 +75,8 @@ function seedToContent(seed: SeedFile): SiteContent {
       title: w.title,
       series: w.series,
       description: w.description,
+      longDescription: w.longDescription ?? null,
+      edition: w.edition ?? null,
       price: w.price,
       buyUrl: w.buyUrl,
       prodigiSku: w.prodigiSku ?? null,
@@ -83,6 +87,17 @@ function seedToContent(seed: SeedFile): SiteContent {
   });
 
   return { sections, works, site: seed.site };
+}
+
+function normalizeContent(content: SiteContent): SiteContent {
+  return {
+    ...content,
+    works: content.works.map((work) => ({
+      ...work,
+      longDescription: work.longDescription ?? null,
+      edition: work.edition ?? null,
+    })),
+  };
 }
 
 const BLOB_CONTENT_PATH = "content/site.json";
@@ -125,11 +140,11 @@ async function loadSeedContent(): Promise<SiteContent> {
 
 export async function ensureContent(): Promise<SiteContent> {
   const fromBlob = await readBlobContent();
-  if (fromBlob) return fromBlob;
+  if (fromBlob) return normalizeContent(fromBlob);
 
   try {
     await fs.access(CONTENT_PATH);
-    return readJson<SiteContent>(CONTENT_PATH);
+    return normalizeContent(await readJson<SiteContent>(CONTENT_PATH));
   } catch {
     const content = await loadSeedContent();
     try {
@@ -263,6 +278,8 @@ export type WorkInput = {
   slug?: string;
   series?: string | null;
   description?: string | null;
+  longDescription?: string | null;
+  edition?: string | null;
   price?: string | null;
   buyUrl?: string | null;
   prodigiSku?: string | null;
@@ -302,6 +319,8 @@ export async function createWork(input: WorkInput) {
     title: input.title,
     series: input.series ?? null,
     description: input.description ?? null,
+    longDescription: input.longDescription ?? null,
+    edition: input.edition ?? null,
     price: input.price ?? null,
     buyUrl: input.buyUrl ?? null,
     prodigiSku: input.prodigiSku ?? null,
@@ -356,6 +375,8 @@ export async function createWorksBatch(input: {
   sectionId: number;
   series?: string | null;
   description?: string | null;
+  longDescription?: string | null;
+  edition?: string | null;
   prodigiSku?: string | null;
   sharedImages?: Array<{ url: string; caption?: string | null }>;
   rows: Array<{
@@ -363,6 +384,7 @@ export async function createWorksBatch(input: {
     price?: string | null;
     buyUrl?: string | null;
     description?: string | null;
+    edition?: string | null;
   }>;
 }) {
   const created = [];
@@ -373,6 +395,8 @@ export async function createWorksBatch(input: {
       title: row.title.trim(),
       series: input.series,
       description: row.description ?? input.description,
+      longDescription: input.longDescription,
+      edition: row.edition ?? input.edition,
       price: row.price,
       buyUrl: row.buyUrl,
       prodigiSku: input.prodigiSku,

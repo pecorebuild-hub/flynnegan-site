@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { SiteShell } from "@/components/SiteShell";
-import { WorkBlock } from "@/components/WorkBlock";
+import { WorkCard } from "@/components/WorkCard";
 import {
   getNavSections,
   getSectionBySlug,
@@ -44,9 +44,7 @@ export default async function SectionPage({ params }: Props) {
       {works.length === 0 ? (
         <p style={{ color: "var(--muted)" }}>No works in this section yet.</p>
       ) : (
-        works.map((work) => (
-          <WorkBlock key={work.id} work={work} sectionSlug={section.slug} />
-        ))
+        works.map((work) => <WorkCard key={work.id} work={work} />)
       )}
     </SiteShell>
   );

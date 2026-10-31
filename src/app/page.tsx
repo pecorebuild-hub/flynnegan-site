@@ -1,5 +1,5 @@
+import Link from "next/link";
 import { SiteShell } from "@/components/SiteShell";
-import { WorkBlock } from "@/components/WorkBlock";
 import {
   getLatestWorks,
   getNavSections,
@@ -23,13 +23,34 @@ export default async function HomePage() {
       {latest.length === 0 ? (
         <p className="lede">No works yet.</p>
       ) : (
-        latest.map((work) => (
-          <WorkBlock
-            key={work.id}
-            work={work}
-            sectionSlug={work.sectionSlug}
-          />
-        ))
+        <div className="latest-grid">
+          {latest.map((work) => {
+            const cover = [...work.images].sort(
+              (a, b) => a.sortOrder - b.sortOrder,
+            )[0];
+            const href = `/${work.sectionSlug}/${work.slug}`;
+            return (
+              <Link key={work.id} href={href} className="latest-item">
+                {cover ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={cover.url}
+                    alt={work.title}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="latest-placeholder" />
+                )}
+                <div className="latest-meta">
+                  <h2 className="work-title">{work.title}</h2>
+                  {work.series ? (
+                    <p className="work-series-name">{work.series}</p>
+                  ) : null}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       )}
     </SiteShell>
   );

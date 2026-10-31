@@ -14,6 +14,8 @@ type Props = {
     title: string;
     series: string;
     description: string;
+    longDescription: string;
+    edition: string;
     price: string;
     buyUrl: string;
     prodigiSku: string;
@@ -26,6 +28,8 @@ const empty = {
   title: "",
   series: "",
   description: "",
+  longDescription: "",
+  edition: "",
   price: "",
   buyUrl: "",
   prodigiSku: "",
@@ -107,6 +111,8 @@ export function WorkForm({ sections, initial }: Props) {
       title: form.title,
       series: form.series || null,
       description: form.description || null,
+      longDescription: form.longDescription || null,
+      edition: form.edition || null,
       price: form.price || null,
       buyUrl: form.buyUrl || null,
       prodigiSku: form.prodigiSku || null,
@@ -163,11 +169,27 @@ export function WorkForm({ sections, initial }: Props) {
         />
       </label>
       <label>
-        Description
+        Short description (size / medium — shown on section listing)
         <textarea
-          rows={5}
+          rows={3}
           value={form.description}
           onChange={(e) => update("description", e.target.value)}
+        />
+      </label>
+      <label>
+        Edition
+        <input
+          value={form.edition}
+          onChange={(e) => update("edition", e.target.value)}
+          placeholder="Ed. 10/10"
+        />
+      </label>
+      <label>
+        Long description (work page only)
+        <textarea
+          rows={8}
+          value={form.longDescription}
+          onChange={(e) => update("longDescription", e.target.value)}
         />
       </label>
       <label>
