@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteShell } from "@/components/SiteShell";
 import {
@@ -5,6 +6,12 @@ import {
   getNavSections,
   getSiteMeta,
 } from "@/lib/content/store";
+import { buildPageMetadata, SITE_DESCRIPTION } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  path: "/",
+  description: SITE_DESCRIPTION,
+});
 
 export default async function HomePage() {
   const [sections, site, latest] = await Promise.all([

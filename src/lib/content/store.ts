@@ -26,8 +26,20 @@ type SeedFile = {
     price: string | null;
     buyUrl: string | null;
     prodigiSku?: string | null;
+    altLabel?: string | null;
+    altDescription?: string | null;
+    altLongDescription?: string | null;
+    altEdition?: string | null;
+    altPrice?: string | null;
+    altBuyUrl?: string | null;
+    altProdigiSku?: string | null;
     sortOrder: number;
     images: Array<{
+      url: string;
+      caption: string;
+      sortOrder: number;
+    }>;
+    altImages?: Array<{
       url: string;
       caption: string;
       sortOrder: number;
@@ -35,6 +47,22 @@ type SeedFile = {
   }>;
   site: SiteContent["site"];
 };
+
+function mapImages(
+  list: Array<{ url: string; caption?: string | null; sortOrder?: number }> | undefined,
+  workId: number,
+  startId: number,
+): { images: SiteWorkImage[]; nextId: number } {
+  let imageId = startId;
+  const images: SiteWorkImage[] = (list || []).map((img, idx) => ({
+    id: imageId++,
+    workId,
+    url: img.url,
+    caption: img.caption || null,
+    sortOrder: img.sortOrder ?? idx,
+  }));
+  return { images, nextId: imageId };
+}
 
 async function readJson<T>(filePath: string): Promise<T> {
   const raw = await fs.readFile(filePath, "utf8");
@@ -60,13 +88,10 @@ function seedToContent(seed: SeedFile): SiteContent {
       throw new Error(`Unknown section slug: ${w.sectionSlug}`);
     }
     const id = workId++;
-    const images: SiteWorkImage[] = (w.images || []).map((img, idx) => ({
-      id: imageId++,
-      workId: id,
-      url: img.url,
-      caption: img.caption || null,
-      sortOrder: img.sortOrder ?? idx,
-    }));
+    const primary = mapImages(w.images, id, imageId);
+    imageId = primary.nextId;
+    const alt = mapImages(w.altImages, id, imageId);
+    imageId = alt.nextId;
     return {
       id,
       sectionId: section.id,
@@ -82,9 +107,17 @@ function seedToContent(seed: SeedFile): SiteContent {
       price: w.price,
       buyUrl: w.buyUrl,
       prodigiSku: w.prodigiSku ?? null,
+      altLabel: w.altLabel ?? null,
+      altDescription: w.altDescription ?? null,
+      altLongDescription: w.altLongDescription ?? null,
+      altEdition: w.altEdition ?? null,
+      altPrice: w.altPrice ?? null,
+      altBuyUrl: w.altBuyUrl ?? null,
+      altProdigiSku: w.altProdigiSku ?? null,
       sortOrder: w.sortOrder,
       published: true,
-      images,
+      images: primary.images,
+      altImages: alt.images,
     };
   });
 
@@ -99,6 +132,14 @@ function normalizeContent(content: SiteContent): SiteContent {
       longDescription: work.longDescription ?? null,
       edition: work.edition ?? null,
       year: work.year ?? null,
+      altLabel: work.altLabel ?? null,
+      altDescription: work.altDescription ?? null,
+      altLongDescription: work.altLongDescription ?? null,
+      altEdition: work.altEdition ?? null,
+      altPrice: work.altPrice ?? null,
+      altBuyUrl: work.altBuyUrl ?? null,
+      altProdigiSku: work.altProdigiSku ?? null,
+      altImages: work.altImages || [],
     })),
   };
 }
@@ -287,8 +328,16 @@ export type WorkInput = {
   price?: string | null;
   buyUrl?: string | null;
   prodigiSku?: string | null;
+  altLabel?: string | null;
+  altDescription?: string | null;
+  altLongDescription?: string | null;
+  altEdition?: string | null;
+  altPrice?: string | null;
+  altBuyUrl?: string | null;
+  altProdigiSku?: string | null;
   published?: boolean;
   images?: Array<{ url: string; caption?: string | null; sortOrder?: number }>;
+  altImages?: Array<{ url: string; caption?: string | null; sortOrder?: number }>;
 };
 
 export async function createWork(input: WorkInput) {
@@ -305,14 +354,11 @@ export async function createWork(input: WorkInput) {
   }
 
   const id = nextId(content.works);
-  const imageBase = nextId(content.works.flatMap((w) => w.images));
-  const images: SiteWorkImage[] = (input.images || []).map((img, idx) => ({
-    id: imageBase + idx,
-    workId: id,
-    url: img.url,
-    caption: img.caption ?? null,
-    sortOrder: img.sortOrder ?? idx,
-  }));
+  const imageBase = nextId(
+    content.works.flatMap((w) => [...w.images, ...(w.altImages || [])]),
+  );
+  const primary = mapImages(input.images, id, imageBase);
+  const alt = mapImages(input.altImages, id, primary.nextId);
 
   const work: SiteWork = {
     id,
@@ -329,10 +375,18 @@ export async function createWork(input: WorkInput) {
     price: input.price ?? null,
     buyUrl: input.buyUrl ?? null,
     prodigiSku: input.prodigiSku ?? null,
+    altLabel: input.altLabel ?? null,
+    altDescription: input.altDescription ?? null,
+    altLongDescription: input.altLongDescription ?? null,
+    altEdition: input.altEdition ?? null,
+    altPrice: input.altPrice ?? null,
+    altBuyUrl: input.altBuyUrl ?? null,
+    altProdigiSku: input.altProdigiSku ?? null,
     sortOrder:
       content.works.filter((w) => w.sectionId === section.id).length + 1,
     published: input.published ?? true,
-    images,
+    images: primary.images,
+    altImages: alt.images,
   };
   content.works.push(work);
   await writeContent(content);
@@ -341,8 +395,11 @@ export async function createWork(input: WorkInput) {
 
 export async function updateWork(
   id: number,
-  patch: Partial<Omit<SiteWork, "id" | "images" | "sectionSlug" | "sectionTitle">> & {
+  patch: Partial<
+    Omit<SiteWork, "id" | "images" | "altImages" | "sectionSlug" | "sectionTitle">
+  > & {
     images?: SiteWorkImage[];
+    altImages?: SiteWorkImage[];
   },
 ) {
   const content = await readContent();
@@ -357,9 +414,10 @@ export async function updateWork(
     work.sectionTitle = section.title;
   }
 
-  const { images, sectionId: _s, ...rest } = patch;
+  const { images, altImages, sectionId: _s, ...rest } = patch;
   Object.assign(work, rest);
   if (images) work.images = images;
+  if (altImages) work.altImages = altImages;
   await writeContent(content);
   return work;
 }

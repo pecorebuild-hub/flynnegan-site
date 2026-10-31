@@ -20,7 +20,15 @@ type Props = {
     price: string;
     buyUrl: string;
     prodigiSku: string;
+    altLabel: string;
+    altDescription: string;
+    altLongDescription: string;
+    altEdition: string;
+    altPrice: string;
+    altBuyUrl: string;
+    altProdigiSku: string;
     images: ImageRow[];
+    altImages: ImageRow[];
   };
 };
 
@@ -35,7 +43,15 @@ const empty = {
   price: "",
   buyUrl: "",
   prodigiSku: "",
+  altLabel: "",
+  altDescription: "",
+  altLongDescription: "",
+  altEdition: "",
+  altPrice: "",
+  altBuyUrl: "",
+  altProdigiSku: "",
   images: [] as ImageRow[],
+  altImages: [] as ImageRow[],
 };
 
 export function WorkForm({ sections, initial }: Props) {
@@ -45,19 +61,24 @@ export function WorkForm({ sections, initial }: Props) {
     sectionId: initial?.sectionId || sections[0]?.id || 0,
     ...initial,
     images: initial?.images || [],
+    altImages: initial?.altImages || [],
   });
   const [error, setError] = useState("");
   const [prodigiInfo, setProdigiInfo] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [altProdigiInfo, setAltProdigiInfo] = useState("");
+  const [uploading, setUploading] = useState<"primary" | "alt" | null>(null);
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function onUpload(fileList: FileList | null) {
+  async function onUpload(
+    fileList: FileList | null,
+    target: "images" | "altImages",
+  ) {
     if (!fileList?.length) return;
-    setUploading(true);
-    const nextImages = [...form.images];
+    setUploading(target === "images" ? "primary" : "alt");
+    const nextImages = [...form[target]];
     for (const file of Array.from(fileList)) {
       const body = new FormData();
       body.append("file", file);
@@ -74,32 +95,35 @@ export function WorkForm({ sections, initial }: Props) {
         });
       }
     }
-    update("images", nextImages);
-    setUploading(false);
+    update(target, nextImages);
+    setUploading(null);
   }
 
-  async function lookupProdigi() {
-    if (!form.prodigiSku.trim()) return;
-    setProdigiInfo("Loading…");
+  async function lookupProdigi(kind: "primary" | "alt") {
+    const sku = kind === "primary" ? form.prodigiSku : form.altProdigiSku;
+    const setInfo = kind === "primary" ? setProdigiInfo : setAltProdigiInfo;
+    if (!sku.trim()) return;
+    setInfo("Loading…");
     const response = await fetch(
-      `/api/admin/prodigi/${encodeURIComponent(form.prodigiSku.trim())}`,
+      `/api/admin/prodigi/${encodeURIComponent(sku.trim())}`,
     );
     const data = await response.json();
     if (!response.ok) {
-      setProdigiInfo(data.error || "Lookup failed");
+      setInfo(data.error || "Lookup failed");
       return;
     }
     const summary = data.summary;
-    setProdigiInfo(summary?.summary || "No details");
+    setInfo(summary?.summary || "No details");
     if (summary?.sizeLine) {
       const sizeLine = summary.sizeLine as string;
+      const field = kind === "primary" ? "description" : "altDescription";
       setForm((prev) => {
-        const current = prev.description || "";
+        const current = prev[field] || "";
         if (current.includes(sizeLine)) return prev;
         const next = current.trim()
           ? `${current.trim()}\n${sizeLine}`
           : sizeLine;
-        return { ...prev, description: next };
+        return { ...prev, [field]: next };
       });
     }
   }
@@ -119,9 +143,22 @@ export function WorkForm({ sections, initial }: Props) {
       price: form.price || null,
       buyUrl: form.buyUrl || null,
       prodigiSku: form.prodigiSku || null,
+      altLabel: form.altLabel || null,
+      altDescription: form.altDescription || null,
+      altLongDescription: form.altLongDescription || null,
+      altEdition: form.altEdition || null,
+      altPrice: form.altPrice || null,
+      altBuyUrl: form.altBuyUrl || null,
+      altProdigiSku: form.altProdigiSku || null,
       images: form.images.map((img, index) => ({
         ...img,
         id: img.id || index + 1,
+        workId: initial?.id || 0,
+        sortOrder: index,
+      })),
+      altImages: form.altImages.map((img, index) => ({
+        ...img,
+        id: img.id || 1000 + index + 1,
         workId: initial?.id || 0,
         sortOrder: index,
       })),
@@ -139,6 +176,71 @@ export function WorkForm({ sections, initial }: Props) {
     }
     router.push("/admin/works");
     router.refresh();
+  }
+
+  function renderImageList(target: "images" | "altImages") {
+    const busy = uploading === (target === "images" ? "primary" : "alt");
+    return (
+      <div>
+        <strong>{target === "images" ? "Photos" : "Alternate photos"}</strong>
+        <label className={`admin-file${busy ? " is-busy" : ""}`}>
+          <span className="admin-file-btn">
+            {busy ? "Uploading…" : "Choose photos"}
+          </span>
+          <span className="admin-file-hint">PNG, JPG — multiple allowed</span>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => onUpload(e.target.files, target)}
+            disabled={Boolean(uploading)}
+          />
+        </label>
+        {form[target].map((image, index) => (
+          <div key={`${target}-${image.url}-${index}`} className="admin-image-row">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="admin-thumb"
+              src={image.url}
+              alt=""
+              referrerPolicy="no-referrer"
+            />
+            <div className="admin-image-fields">
+              <input
+                placeholder="Image URL"
+                value={image.url}
+                onChange={(e) => {
+                  const images = [...form[target]];
+                  images[index] = { ...image, url: e.target.value };
+                  update(target, images);
+                }}
+              />
+              <input
+                placeholder="Caption"
+                value={image.caption}
+                onChange={(e) => {
+                  const images = [...form[target]];
+                  images[index] = { ...image, caption: e.target.value };
+                  update(target, images);
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              className="admin-btn secondary"
+              onClick={() =>
+                update(
+                  target,
+                  form[target].filter((_, i) => i !== index),
+                )
+              }
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -228,7 +330,7 @@ export function WorkForm({ sections, initial }: Props) {
           <button
             className="admin-btn secondary"
             type="button"
-            onClick={lookupProdigi}
+            onClick={() => lookupProdigi("primary")}
           >
             Lookup
           </button>
@@ -238,68 +340,82 @@ export function WorkForm({ sections, initial }: Props) {
         <p style={{ color: "#555", whiteSpace: "pre-wrap" }}>{prodigiInfo}</p>
       ) : null}
 
-      <div>
-        <strong>Photos</strong>
-        <label className={`admin-file${uploading ? " is-busy" : ""}`}>
-          <span className="admin-file-btn">
-            {uploading ? "Uploading…" : "Choose photos"}
-          </span>
-          <span className="admin-file-hint">PNG, JPG — multiple allowed</span>
+      {renderImageList("images")}
+
+      <hr className="admin-divider" />
+      <h2 className="admin-subheading">Alternate format (optional)</h2>
+      <p className="admin-help">
+        Use this for a second product of the same work — e.g. print + canvas.
+        Leave empty if not needed.
+      </p>
+      <label>
+        Alternate label
+        <input
+          value={form.altLabel}
+          onChange={(e) => update("altLabel", e.target.value)}
+          placeholder="Canvas / Dibond / etc."
+        />
+      </label>
+      <label>
+        Alternate short description
+        <textarea
+          rows={3}
+          value={form.altDescription}
+          onChange={(e) => update("altDescription", e.target.value)}
+        />
+      </label>
+      <label>
+        Alternate edition
+        <input
+          value={form.altEdition}
+          onChange={(e) => update("altEdition", e.target.value)}
+          placeholder="Ed. 5/5"
+        />
+      </label>
+      <label>
+        Alternate long description
+        <textarea
+          rows={6}
+          value={form.altLongDescription}
+          onChange={(e) => update("altLongDescription", e.target.value)}
+        />
+      </label>
+      <label>
+        Alternate price
+        <input
+          value={form.altPrice}
+          onChange={(e) => update("altPrice", e.target.value)}
+        />
+      </label>
+      <label>
+        Alternate buy link
+        <input
+          value={form.altBuyUrl}
+          onChange={(e) => update("altBuyUrl", e.target.value)}
+        />
+      </label>
+      <label>
+        Alternate Prodigi SKU
+        <div style={{ display: "flex", gap: "0.5rem" }}>
           <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => onUpload(e.target.files)}
-            disabled={uploading}
+            value={form.altProdigiSku}
+            onChange={(e) => update("altProdigiSku", e.target.value)}
+            placeholder="Optional"
           />
-        </label>
-        {form.images.map((image, index) => (
-          <div
-            key={`${image.url}-${index}`}
-            className="admin-image-row"
+          <button
+            className="admin-btn secondary"
+            type="button"
+            onClick={() => lookupProdigi("alt")}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className="admin-thumb"
-              src={image.url}
-              alt=""
-              referrerPolicy="no-referrer"
-            />
-            <div className="admin-image-fields">
-              <input
-                placeholder="Image URL"
-                value={image.url}
-                onChange={(e) => {
-                  const images = [...form.images];
-                  images[index] = { ...image, url: e.target.value };
-                  update("images", images);
-                }}
-              />
-              <input
-                placeholder="Caption"
-                value={image.caption}
-                onChange={(e) => {
-                  const images = [...form.images];
-                  images[index] = { ...image, caption: e.target.value };
-                  update("images", images);
-                }}
-              />
-            </div>
-            <button
-              type="button"
-              className="admin-btn secondary"
-              onClick={() =>
-                update(
-                  "images",
-                  form.images.filter((_, i) => i !== index),
-                )
-              }
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-      </div>
+            Lookup
+          </button>
+        </div>
+      </label>
+      {altProdigiInfo ? (
+        <p style={{ color: "#555", whiteSpace: "pre-wrap" }}>{altProdigiInfo}</p>
+      ) : null}
+
+      {renderImageList("altImages")}
 
       {error ? <p style={{ color: "#b00020" }}>{error}</p> : null}
       <button type="submit">{initial?.id ? "Save" : "Create"}</button>

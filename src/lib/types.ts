@@ -33,9 +33,18 @@ export type SiteWork = {
   price: string | null;
   buyUrl: string | null;
   prodigiSku: string | null;
+  /** Optional second format (e.g. canvas) */
+  altLabel: string | null;
+  altDescription: string | null;
+  altLongDescription: string | null;
+  altEdition: string | null;
+  altPrice: string | null;
+  altBuyUrl: string | null;
+  altProdigiSku: string | null;
   sortOrder: number;
   published: boolean;
   images: SiteWorkImage[];
+  altImages: SiteWorkImage[];
 };
 
 export type SiteContent = {
@@ -55,4 +64,15 @@ export function splitBrandTitle(title: string): { line1: string; line2: string }
     line1: title.slice(0, dot + 1).trim(),
     line2: title.slice(dot + 1).trim(),
   };
+}
+
+export function workHasAltFormat(work: SiteWork): boolean {
+  return Boolean(
+    work.altLabel ||
+      work.altDescription ||
+      work.altLongDescription ||
+      work.altBuyUrl ||
+      work.altPrice ||
+      (work.altImages && work.altImages.length),
+  );
 }
