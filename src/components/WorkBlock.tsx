@@ -36,8 +36,8 @@ export function WorkBlock({ work, sectionSlug }: Props) {
           </p>
         ) : null}
         <TextBlocks text={work.description} />
-        {work.year ? <p>{work.year}</p> : null}
-        {work.edition ? <p>{work.edition}</p> : null}
+        {work.year ? <p className="work-meta-dim">{work.year}</p> : null}
+        {work.edition ? <p className="work-meta-dim">{work.edition}</p> : null}
         <TextBlocks text={work.longDescription} />
         {work.buyUrl && primaryPrice ? (
           <a

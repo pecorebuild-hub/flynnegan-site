@@ -325,6 +325,10 @@ button:active {
   white-space: pre-wrap;
 }
 
+.work-meta-dim {
+  color: var(--muted);
+}
+
 .work-meta .buy-button {
   margin-top: 0.35rem;
   margin-right: 0.65rem;

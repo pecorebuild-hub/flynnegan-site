@@ -33,8 +33,8 @@ export function WorkCard({ work }: Props) {
 
       <div className="work-meta">
         <TextBlocks text={work.description} />
-        {work.year ? <p>{work.year}</p> : null}
-        {work.edition ? <p>{work.edition}</p> : null}
+        {work.year ? <p className="work-meta-dim">{work.year}</p> : null}
+        {work.edition ? <p className="work-meta-dim">{work.edition}</p> : null}
         {work.buyUrl && primaryPrice ? (
           <a
             className="buy-button"
