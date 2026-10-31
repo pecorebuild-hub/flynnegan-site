@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { getNavSections, readContent } from "@/lib/content/store";
 import { SITE_URL } from "@/lib/seo";
 
+/** Blob-backed catalogue — must not be statically prerendered at build. */
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [content, sections] = await Promise.all([
     readContent(),

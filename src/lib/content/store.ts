@@ -148,21 +148,66 @@ const BLOB_CONTENT_PATH = "content/site.json";
 const BLOB_CONTENT_BACKUP_PREFIX = "content/backups/site-";
 /** Keep a few timestamped backups so a bad write/seed wipe is recoverable. */
 const BLOB_BACKUP_LIMIT = 10;
+const BLOB_PUBLIC_URL =
+  process.env.BLOB_CONTENT_URL ||
+  "https://yuqb8oa3slz8tt3a.public.blob.vercel-storage.com/content/site.json";
 
 type BlobReadResult =
   | { status: "ok"; content: SiteContent }
   | { status: "missing" }
   | { status: "error"; message: string };
 
+function isBuildPhase() {
+  return process.env.NEXT_PHASE === "phase-production-build";
+}
+
+function isNextDynamicBailout(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const err = error as { message?: string; digests?: string; digest?: string };
+  return (
+    err.digest === "DYNAMIC_SERVER_USAGE" ||
+    (typeof err.message === "string" &&
+      err.message.includes("Dynamic server usage"))
+  );
+}
+
 async function readBlobContent(): Promise<BlobReadResult> {
+  // Prefer direct public URL — avoids list() flakiness and works at runtime.
+  try {
+    const response = await fetch(BLOB_PUBLIC_URL, {
+      cache: "no-store",
+      // Next may still mark the route dynamic; callers must allow that.
+    });
+    if (response.status === 404) {
+      // Fall through to token list in case the public URL/env is wrong.
+    } else if (response.ok) {
+      return {
+        status: "ok",
+        content: (await response.json()) as SiteContent,
+      };
+    }
+  } catch (error) {
+    // Never swallow Next's dynamic-render bailout as a "blob miss".
+    if (isNextDynamicBailout(error)) throw error;
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return {
+        status: "error",
+        message: error instanceof Error ? error.message : "Blob read failed",
+      };
+    }
+  }
+
   if (!process.env.BLOB_READ_WRITE_TOKEN) return { status: "missing" };
+
   try {
     const { list } = await import("@vercel/blob");
     const result = await list({
       prefix: BLOB_CONTENT_PATH,
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
-    const blob = result.blobs.find((item) => item.pathname === BLOB_CONTENT_PATH);
+    const blob = result.blobs.find(
+      (item) => item.pathname === BLOB_CONTENT_PATH,
+    );
     if (!blob) return { status: "missing" };
     const response = await fetch(blob.url, { cache: "no-store" });
     if (response.status === 404) return { status: "missing" };
@@ -177,6 +222,7 @@ async function readBlobContent(): Promise<BlobReadResult> {
       content: (await response.json()) as SiteContent,
     };
   } catch (error) {
+    if (isNextDynamicBailout(error)) throw error;
     return {
       status: "error",
       message: error instanceof Error ? error.message : "Blob read failed",
@@ -207,16 +253,40 @@ async function pruneBlobBackups(token: string) {
   }
 }
 
-async function writeBlobContent(content: SiteContent): Promise<boolean> {
+async function writeBlobContent(
+  content: SiteContent,
+  options?: { allowSeedOverwrite?: boolean },
+): Promise<boolean> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return false;
+  // Builds must never mutate live content.
+  if (isBuildPhase()) return false;
+
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   const { put } = await import("@vercel/blob");
   const body = JSON.stringify(content, null, 2);
 
-  // Snapshot current file before overwrite (ignore if missing).
+  // Snapshot + guard against accidental seed wipe of a fuller catalogue.
   try {
     const current = await readBlobContent();
     if (current.status === "ok") {
+      const currentCount = current.content.works?.length ?? 0;
+      const nextCount = content.works?.length ?? 0;
+      if (
+        !options?.allowSeedOverwrite &&
+        currentCount > nextCount &&
+        nextCount <= 4
+      ) {
+        const seed = await loadSeedContent();
+        const looksLikeSeed =
+          nextCount === seed.works.length &&
+          content.works.every((work, i) => work.slug === seed.works[i]?.slug);
+        if (looksLikeSeed) {
+          throw new Error(
+            `Refusing to overwrite ${currentCount} works with seed (${nextCount}). Use Reset from seed.json explicitly.`,
+          );
+        }
+      }
+
       await put(
         `${BLOB_CONTENT_BACKUP_PREFIX}${Date.now()}.json`,
         JSON.stringify(current.content, null, 2),
@@ -230,7 +300,14 @@ async function writeBlobContent(content: SiteContent): Promise<boolean> {
       );
       await pruneBlobBackups(token);
     }
-  } catch {
+  } catch (error) {
+    if (isNextDynamicBailout(error)) throw error;
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Refusing to overwrite")
+    ) {
+      throw error;
+    }
     // Continue with the primary write even if backup fails.
   }
 
@@ -262,6 +339,10 @@ export async function ensureContent(): Promise<SiteContent> {
       await fs.access(CONTENT_PATH);
       return normalizeContent(await readJson<SiteContent>(CONTENT_PATH));
     } catch {
+      // During build, serve seed in-memory only — never persist it.
+      if (isBuildPhase()) {
+        return loadSeedContent();
+      }
       throw new Error(
         `Cannot read site content from Blob (${fromBlob.message}). Refusing to overwrite with seed.`,
       );
@@ -275,11 +356,17 @@ export async function ensureContent(): Promise<SiteContent> {
     // First boot / empty store: serve seed in-memory (and locally if writable).
     // Do NOT push seed to Blob — that only happens via explicit resetFromSeed().
     const content = await loadSeedContent();
-    try {
-      await fs.mkdir(DATA_DIR, { recursive: true });
-      await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
-    } catch {
-      // read-only FS (e.g. Vercel)
+    if (!isBuildPhase()) {
+      try {
+        await fs.mkdir(DATA_DIR, { recursive: true });
+        await fs.writeFile(
+          CONTENT_PATH,
+          JSON.stringify(content, null, 2),
+          "utf8",
+        );
+      } catch {
+        // read-only FS (e.g. Vercel)
+      }
     }
     return content;
   }
@@ -289,8 +376,12 @@ export async function readContent(): Promise<SiteContent> {
   return ensureContent();
 }
 
-export async function writeContent(content: SiteContent): Promise<void> {
-  const wroteBlob = await writeBlobContent(content);
+export async function writeContent(
+  content: SiteContent,
+  options?: { allowSeedOverwrite?: boolean },
+): Promise<void> {
+  const wroteBlob = await writeBlobContent(content, options);
+  if (isBuildPhase()) return;
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
     await fs.writeFile(CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
@@ -319,7 +410,7 @@ export async function getWorksBySectionSlug(slug: string) {
   const content = await readContent();
   return content.works
     .filter((w) => w.sectionSlug === slug && w.published)
-    .sort((a, b) => a.sortOrder - b.sortOrder);
+    .sort((a, b) => b.id - a.id);
 }
 
 export async function getWorkBySlug(slug: string) {
@@ -511,7 +602,7 @@ export async function deleteWork(id: number) {
 
 export async function resetFromSeed() {
   const content = await loadSeedContent();
-  await writeContent(content);
+  await writeContent(content, { allowSeedOverwrite: true });
   return content;
 }
 
