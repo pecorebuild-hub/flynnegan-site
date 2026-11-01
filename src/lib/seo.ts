@@ -103,9 +103,10 @@ export function personJsonLd() {
       "https://bsky.app/profile/flynnflynnegan.bsky.social",
       "https://fetlife.com/Maitre_Flynn",
       "https://throne.com/flynnegan/",
+      "https://www.artmajeur.com/flynn-egan-9092466",
       "https://objkt.com/users/tz1YbjHhB9sdjpAKPmb5hphGAR4LHW3Todtm",
     ],
-    email: "mailto:flynnflynnegan@gmail.com",
+    email: "mailto:flynnflynn.egan@gmail.com",
   };
 }
 

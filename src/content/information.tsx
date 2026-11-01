@@ -148,7 +148,7 @@ export function InformationContent() {
             fetlife.com/Maitre_Flynn
           </a>
           ), or Email (
-          <a href="mailto:flynnflynnegan@gmail.com">flynnflynnegan@gmail.com</a>
+          <a href="mailto:flynnflynn.egan@gmail.com">flynnflynn.egan@gmail.com</a>
           )
         </p>
       </section>

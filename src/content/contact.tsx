@@ -25,7 +25,17 @@ export function ContactContent() {
       </p>
       <p>
         [3] Email:{" "}
-        <a href="mailto:flynnflynnegan@gmail.com">flynnflynnegan@gmail.com</a>
+        <a href="mailto:flynnflynn.egan@gmail.com">flynnflynn.egan@gmail.com</a>
+      </p>
+      <p>
+        [4] ArtMajeur:{" "}
+        <a
+          href="https://www.artmajeur.com/flynn-egan-9092466"
+          target="_blank"
+          rel="noreferrer"
+        >
+          artmajeur.com/flynn-egan-9092466
+        </a>
       </p>
     </article>
   );

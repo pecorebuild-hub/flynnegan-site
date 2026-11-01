@@ -151,7 +151,7 @@ export function CommissionsContent() {
         </p>
         <p>
           [3] Email:{" "}
-          <a href="mailto:flynnflynnegan@gmail.com">flynnflynnegan@gmail.com</a>
+          <a href="mailto:flynnflynn.egan@gmail.com">flynnflynn.egan@gmail.com</a>
         </p>
       </section>
     </article>
