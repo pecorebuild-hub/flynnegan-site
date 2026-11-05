@@ -5,9 +5,9 @@ import { useState } from "react";
 const ACTION = "https://flynnegan.substack.com/api/v1/free?nojs=true";
 
 /**
- * Real Substack signup via browser form POST (same as their embed).
- * `fetch` + no-cors was a fake success — Cloudflare/API rejected those calls.
- * Posts into a hidden iframe so the reader stays on-site.
+ * Substack signup via a real browser form POST.
+ * Hidden iframes are blocked by Substack CSP (frame-ancestors), so the
+ * confirmation/welcome page must open in a new tab for the subscribe to stick.
  */
 export function SubstackSubscribe() {
   const [done, setDone] = useState(false);
@@ -18,10 +18,11 @@ export function SubstackSubscribe() {
         className="nav-substack-form"
         action={ACTION}
         method="post"
-        target="substack-subscribe-frame"
+        target="_blank"
+        rel="noopener noreferrer"
         style={done ? { display: "none" } : undefined}
         onSubmit={() => {
-          window.setTimeout(() => setDone(true), 500);
+          window.setTimeout(() => setDone(true), 300);
         }}
       >
         <input type="hidden" name="source" value="embed" />
@@ -66,16 +67,10 @@ export function SubstackSubscribe() {
 
       {done ? (
         <p className="nav-substack-done">
-          Access Granted. Check your inbox for the Private Vault link!
+          Almost there — finish in the Substack tab that just opened, then check
+          your inbox (and spam).
         </p>
       ) : null}
-
-      <iframe
-        className="nav-substack-frame"
-        name="substack-subscribe-frame"
-        title="Substack subscribe"
-        tabIndex={-1}
-      />
     </div>
   );
 }
