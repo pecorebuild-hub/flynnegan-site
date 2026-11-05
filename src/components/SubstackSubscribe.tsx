@@ -19,7 +19,7 @@ export function SubstackSubscribe() {
           value="https://gayart.studio/"
         />
         <label className="nav-substack-label" htmlFor="substack-email">
-          Newsletter
+            Stay In Touch
         </label>
         <div className="nav-substack-row">
           <input
