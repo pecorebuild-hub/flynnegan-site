@@ -26,7 +26,19 @@ export default function AdminSectionsPage() {
   }
 
   useEffect(() => {
-    void load();
+    let ignore = false;
+    void (async () => {
+      const response = await fetch("/api/admin/sections");
+      if (!response.ok) {
+        if (!ignore) setError("Unauthorized or failed to load");
+        return;
+      }
+      const data = await response.json();
+      if (!ignore) setSections(data.sections);
+    })();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   async function onCreate(event: FormEvent) {

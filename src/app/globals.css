@@ -200,14 +200,18 @@ button:active {
 .nav-substack-input {
   flex: 1 1 10rem;
   min-width: 0;
+  height: 2.65rem;
+  box-sizing: border-box;
   margin: 0;
-  padding: 0.55rem 0.7rem;
+  padding: 0 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 0;
   background: rgba(255, 255, 255, 0.06);
   color: #fff;
   font: inherit;
   font-size: 0.95rem;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .nav-substack-input::placeholder {
@@ -221,8 +225,10 @@ button:active {
 
 .nav-substack-btn {
   flex: 0 0 auto;
+  height: 2.65rem;
+  box-sizing: border-box;
   margin: 0;
-  padding: 0.55rem 0.9rem;
+  padding: 0 1rem;
   border: 0;
   border-radius: 0;
   background: #fff;
@@ -231,6 +237,11 @@ button:active {
   font-size: 0.95rem;
   font-weight: 520;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-substack-btn:disabled {
@@ -945,10 +956,26 @@ button:active {
 
   .nav-substack-row {
     flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nav-substack-input {
+    flex: none;
+    width: 100%;
+    height: 2.75rem;
+    min-height: 2.75rem;
+    font-size: 1rem;
+    padding: 0 0.85rem;
+    box-sizing: border-box;
   }
 
   .nav-substack-btn {
+    flex: none;
     width: 100%;
+    height: 2.75rem;
+    min-height: 2.75rem;
+    font-size: 0.95rem;
+    box-sizing: border-box;
   }
 
   .gallery-grid {

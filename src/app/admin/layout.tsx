@@ -51,6 +51,7 @@ export default async function AdminLayout({
           <Link href="/admin/sections">Sections</Link>
           <Link href="/admin/works">Works</Link>
           <Link href="/admin/works/batch">Batch</Link>
+          <Link href="/admin/subscribers">Subscribers</Link>
           <Link href="/" target="_blank">
             View site
           </Link>

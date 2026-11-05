@@ -47,6 +47,13 @@ export type SiteWork = {
   altImages: SiteWorkImage[];
 };
 
+export type SiteSubscriber = {
+  id?: number;
+  email: string;
+  source: string;
+  createdAt: string;
+};
+
 export type SiteContent = {
   sections: SiteSection[];
   works: SiteWork[];
@@ -55,6 +62,7 @@ export type SiteContent = {
     tagline: string;
     description: string;
   };
+  subscribers?: SiteSubscriber[];
 };
 
 export function splitBrandTitle(title: string): { line1: string; line2: string } {

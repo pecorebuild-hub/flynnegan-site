@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import AgeGateModal from "@/components/AgeGateModal";
 import { JsonLd } from "@/components/JsonLd";
 import { DEFAULT_FONT_VARIANT } from "@/lib/fonts";
 import {
@@ -69,6 +70,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-font={DEFAULT_FONT_VARIANT}>
       <body>
+        <AgeGateModal />
         <JsonLd data={personJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
         {children}

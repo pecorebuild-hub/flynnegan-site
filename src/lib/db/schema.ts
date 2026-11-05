@@ -21,6 +21,15 @@ export const siteDocuments = pgTable("site_documents", {
     .notNull(),
 });
 
+export const subscribers = pgTable("subscribers", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  source: text("source").notNull().default("site"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 /** Kept for future normalized queries; not used by the content store yet. */
 export const sections = pgTable("sections", {
   id: serial("id").primaryKey(),
@@ -74,3 +83,5 @@ export const workImages = pgTable("work_images", {
 export type Section = typeof sections.$inferSelect;
 export type Work = typeof works.$inferSelect;
 export type WorkImage = typeof workImages.$inferSelect;
+export type Subscriber = typeof subscribers.$inferSelect;
+export type NewSubscriber = typeof subscribers.$inferInsert;

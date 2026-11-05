@@ -22,7 +22,16 @@ export default function AdminWorksPage() {
   }
 
   useEffect(() => {
-    void load();
+    let ignore = false;
+    void (async () => {
+      const response = await fetch("/api/admin/works");
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!ignore) setWorks(data.works);
+    })();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   async function onDelete(id: number) {

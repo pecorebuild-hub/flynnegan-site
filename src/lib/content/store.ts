@@ -662,6 +662,7 @@ export async function updateWork(
   }
 
   const { images, altImages, sectionId: _s, ...rest } = patch;
+  void _s;
   Object.assign(work, rest);
   if (images) work.images = images;
   if (altImages) work.altImages = altImages;
