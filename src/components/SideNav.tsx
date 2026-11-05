@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SubstackSubscribe } from "@/components/SubstackSubscribe";
 import type { SiteSection } from "@/lib/types";
 import { splitBrandTitle } from "@/lib/types";
 
@@ -67,17 +68,7 @@ export function SideNav({
         </div>
       </nav>
 
-      <div className="nav-substack">
-        <iframe
-          src="https://flynnegan.substack.com/embed?transparent=1&light=1"
-          width={480}
-          height={320}
-          style={{ border: 0, background: "transparent" }}
-          frameBorder={0}
-          scrolling="no"
-          title="Subscribe via Substack"
-        />
-      </div>
+      <SubstackSubscribe />
     </aside>
   );
 }
