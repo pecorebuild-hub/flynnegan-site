@@ -68,7 +68,7 @@ export function SubstackSubscribe() {
             type="submit"
             disabled={status === "loading"}
           >
-            {status === "loading" ? "Connecting…" : "Unlock Access"}
+            {status === "loading" ? "Connecting…" : "Subscribe"}
           </button>
         </div>
         {status === "error" ? (
