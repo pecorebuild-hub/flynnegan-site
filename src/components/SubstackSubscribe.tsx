@@ -60,7 +60,7 @@ export function SubstackSubscribe() {
             name="email"
             required
             autoComplete="email"
-            placeholder="Enter your email for Collector's Vault"
+            placeholder="Enter your email"
             disabled={status === "loading"}
           />
           <button
